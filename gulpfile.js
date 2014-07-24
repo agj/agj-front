@@ -2,7 +2,6 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var rjs = require('requirejs');
-var rjsReplace = require('gulp-requirejs-replace-script');
 var replace = require('gulp-replace');
 var clean = require('gulp-clean');
 
@@ -26,8 +25,7 @@ gulp.task('clean', function () {
 
 gulp.task('copyHTML', function () {
 	return gulp.src(path.src + '*.html')
-		.pipe(rjsReplace(['js/app']))
-		.pipe(replace(/(src="js\/)app(\.js")/g, '$1script$2'))
+		.pipe(replace(/(data-main="js\/app"\s+)src="js\/lib\/require\.js"/g, 'src="js/script.js"'))
 		.pipe(gulp.dest(path.build));
 });
 
