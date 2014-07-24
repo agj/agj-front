@@ -1,0 +1,13 @@
+/**
+ * Code by agj - http://www.agj.cl/
+ */
+
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		"app": "../app"
+	},
+});
+
+require(["app/main"]);
+
