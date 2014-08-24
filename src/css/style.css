@@ -146,13 +146,9 @@ a:hover .char .blink 75% {
   margin-bottom: 21.3pt;
   display: inline-block;
   vertical-align: bottom;
-  border: 2px solid #colorText;
   background-color: #cdcdde;
-  color: #7f7e7e;
+  color: #000000;
 }
 #main #about a {
-  color: #7f7e7e;
-}
-#main #about .swapped.turn4 {
-  color: #dadbe4;
+  color: #000000;
 }

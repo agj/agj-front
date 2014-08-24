@@ -1,9 +1,9 @@
 
 @import url('prefixer.less');
 
-@colorText: rgba(205, 205, 222, 1);
+@colorTextLarge: rgba(205, 205, 222, 1);
 @colorBackground: rgba(218, 219, 228, 1);
-@colorHover: #000;
+@colorTextAbout: #000;
 
 @colors:
 	#ff00cc,
@@ -12,7 +12,7 @@
 	#7f7e7e;
 
 body {
-	color: @colorText;
+	color: @colorTextLarge;
 	background-color: @colorBackground;
 	
 	font: 160pt/0.8 Helvetica, "Helvetica Neue", "Trebuchet MS", Trebuchet, Lucida, sans-serif;
@@ -26,7 +26,7 @@ body {
 a {
 	&, &:visited, &:link {
 		text-decoration: none;
-		color: @colorText;
+		color: @colorTextLarge;
 	}
 	&:hover {
 		z-index: 1000;
@@ -106,18 +106,19 @@ a {
 		margin-bottom: 21.3pt;
 		display: inline-block;
 		vertical-align: bottom;
-		border: 2px solid #colorText;
 
-		background-color: @colorText;
-		color: extract(@colors, 4);
+		background-color: @colorTextLarge;
+		// color: extract(@colors, 4);
+		color: @colorTextAbout;
 
 		a {
-			color: extract(@colors, 4);
+			// color: extract(@colors, 4);
+			color: @colorTextAbout;
 		}
 
-		.swapped.turn4 {
-			color: @colorBackground;
-		}
+		// .swapped.turn4 {
+		// 	color: @colorBackground;
+		// }
 	}
 }
 

@@ -508,19 +508,93 @@ define( 'agj/function/parameters',['require','../to','../function/sequence'],fun
 });
 
 
-define( 'agj/function/autoCurryArityFn',[],function () {
+define( 'agj/function/overload',['require','../utils/toArray'],function (require) {
 	
 
+	var toArray = require('../utils/toArray');
+
+	function isFn(obj) {
+		return typeof obj === 'function';
+	}
+
+	function last(array) {
+		return array[array.length - 1];
+	}
+
+	function overload(target, predicates, over) {
+		if (isFn(target)) {
+			var allowsRest = last(predicates) === rest;
+			return function overloaded() {
+				if (!allowsRest && arguments.length !== predicates.length) return target.apply(this, arguments);
+				var i = -1;
+				var len = predicates.length;
+				while (++i < len) {
+					var predicate = predicates[i];
+					if (allowsRest && predicate === rest) break;
+					if (!predicate(arguments[i])) return target.apply(this, arguments);
+				}
+				return over.apply(this, arguments);
+			};
+		}
+
+		var current = last(arguments);
+		var list = isFn(current) ? toArray(arguments, 0, -1) : toArray(arguments);
+		if (!isFn(current)) current = function () {};
+
+		var i = list.length;
+		while (--i >= 0) {
+			current = overload(current, list[i][0], list[i][1]);
+		}
+
+		return current;
+	}
+
+	var rest = {};
+	Object.defineProperty(overload, 'rest', { value: rest });
+
+	return overload;
+
+});
+
+
+define( 'agj/function/autoCurryArityFn',['require','./overload'],function (require) {
+	
+
+	var overload = require('./overload');
+
+	function isFn(obj) {
+		return typeof obj === 'function';
+	}
+	function isNumber(obj) {
+		return typeof obj === 'number';
+	}
+
 	function autoCurryArityFn(target) {
-		return function autoCurriedArityFn(arity, fn) {
-			if (typeof arity === 'function') {
-				fn = arity;
+		return overload(
+			[[isFn], function (fn) {
 				return target(fn.length, fn);
-			} else if (fn) {
+			}],
+			[[isNumber, isFn, overload.rest], target],
+			[[isFn, isNumber, overload.rest], function (fn, arity) {
 				return target(arity, fn);
-			}
-			return function (fn) { return target(arity, fn); };
-		};
+			}],
+			[[isNumber], function (arity) {
+				return function (fn) {
+					return target(arity, fn);
+				};
+			}],
+			target
+		);
+
+		// return function autoCurriedArityFn(arity, fn) {
+		// 	if (typeof arity === 'function') {
+		// 		fn = arity;
+		// 		return target(fn.length, fn);
+		// 	} else if (fn) {
+		// 		return target(arity, fn);
+		// 	}
+		// 	return function (fn) { return target(arity, fn); };
+		// };
 	}
 
 	return autoCurryArityFn;
@@ -595,7 +669,7 @@ define( 'agj/is',['require','./function/autoCurry','./object/values','./is/array
 	var toString = Object.prototype.toString.call.bind(Object.prototype.toString);
 
 	function set(object) {
-		return object !== void 0 && object !== null && (typeof object !== 'number' || !isNaN(object));
+		return object !== void 0 && object !== null && object !== '' && (typeof object !== 'number' || !isNaN(object));
 	}
 
 	function undef(object) {
@@ -688,20 +762,22 @@ define( 'agj/domGenerator/anyEl',['require','../to','../is','../utils/toArray','
 		return els;
 	}
 
-	var splitAndTrim     = sequence(get(1), call('split', ['.']), call('map', [call('trim')]));
-	var trim             = sequence(get(1), call('trim'));
-	var trimAndLowerCase = sequence(trim, call('toLowerCase'));
+	var processTag       = get(1);
+	var processID        = get(1);
+	var processClasses   = sequence(call('map', [call('substr', [1])] ));
 
 	function anyEl(tag, attrs) {
-		var classes = setElseDo(tag.match(/^[^\.]*\.(.+)$/),     [], splitAndTrim);
-		var id      = setElseDo(tag.match(/#([^\.]+)(\.|$)/),    '', trim);
-		tag         = setElseDo(tag.match(/^([^\.#]+)(\.|#|$)/), '', trimAndLowerCase);
+		var id      = setElseDo(tag.match(/#([^\.\s]+)/),  null, processID);
+		var classes = setElseDo(tag.match(/\.[^\.\s#]+/g), null, processClasses);
+		tag         = setElseDo(tag.match(/^([^\.\s#]+)/), null, processTag);
+
+		if (tag === null) throw "No tag specified.";
 
 		var contents = toArray(arguments, is.objectLiteral(attrs) ? 2 : 1);
 
 		var element = document.createElement(tag);
-		if (id) element.id = id;
-		if (classes.length) element.className = classes.join(' ');
+		if (id !== null) element.id = id;
+		if (classes !== null) element.className = classes.join(' ');
 
 		if (is.objectLiteral(attrs)) {
 			Object.keys(attrs).forEach( function (name) {
@@ -754,14 +830,14 @@ define( 'agj/domGenerator/toEl',['require','../is','./anyEl','../utils/toArray',
 
 	var toEl = memoize( function toEl(tag) {
 		return function () {
-			var id = '';
-			var first = arguments[0];
-			var i = 0;
+			var args = toArray(arguments);
+			var first = args[0];
 			if (is.string(first) && (first[0] === '#' || first[0] === '.')) {
-				id = first;
-				i++;
+				args[0] = tag + args[0];
+			} else {
+				args = [tag].concat(args);
 			}
-			return anyEl.apply(null, [tag + id].concat(toArray(arguments, i)));
+			return anyEl.apply(null, args);
 		};
 	});
 
@@ -777,8 +853,15 @@ define( 'agj/domGenerator/inject',['require','../function/parameters','./toEl'],
 	var toEl = require('./toEl');
 
 	function inject(fn) {
-		var tags = parameters(fn).map(toEl);
+		var tags = parameters(fn).map(paramToTagName).map(toEl);
 		return fn.apply(null, tags);
+	}
+
+	function paramToTagName(paramName) {
+		return paramName
+			.replace(/([A-Z])/g, '-$1')
+			.replace(/(_)/g, ':')
+			.toLowerCase();
 	}
 
 	return inject;
