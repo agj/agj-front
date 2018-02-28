@@ -1,58 +1,58 @@
 
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var rjs = require('requirejs');
-var replace = require('gulp-replace');
-var clean = require('gulp-clean');
+// Requires.
+
+const gulp = require('gulp');
+const browserify = require('browserify');
+const watchify = require('watchify');
+const babelify = require('babelify');
+const source = require('vinyl-source-stream');
+const R = require('ramda');
+const argv = require('yargs').argv;
+const gutil = require('gulp-util');
+const uglify = require('gulp-uglify');
+const es = require('event-stream');
+const buffer = require('vinyl-buffer');
+const rename = require('gulp-rename');
+require('dot-into').install();
 
 
-var path = {
-	src:   'src/',
-	build: 'build/',
+// Options.
+
+const browserifyOpts = {
+	entries: 'src/js/index.js',
+	debug: true,
 };
 
 
-gulp.task('default', ['clean'], function () {
-	gulp.start('build');
-});
-gulp.task('build', ['copyHTML', 'copyFiles', 'parseAMD']);
+// Preparation.
+
+const watch = !!argv.watch;
+
+const getBrowserify = opts =>
+	browserify(opts)
+	.transform('babelify', { presets: 'es2015' });
+const b = !watch
+	? getBrowserify(browserifyOpts)
+	: watchify(getBrowserify(R.merge(watchify.args, browserifyOpts)));
+const bundle = () =>
+	b.bundle()
+	.on('error', gutil.log.bind(gutil, "Browserify error."))
+	.pipe(source('script.js'))
+	// .pipe(buffer()).pipe(uglify())
+	.pipe(gulp.dest('dist/js/'));
+
+if (watch) {
+	b.on('update', bundle);
+	gulp.watch('src/**/*.css', ['copy']);
+}
+b.on('log', gutil.log);
 
 
-gulp.task('clean', function () {
-	return gulp.src([path.build + '**/*'], { read: false })
-		.pipe(clean());
-});
+// Tasks.
 
-gulp.task('copyHTML', function () {
-	return gulp.src(path.src + '*.html')
-		.pipe(replace(/(data-main="js\/app"\s+)src="js\/lib\/require\.js"/g, 'src="js/script.js"'))
-		.pipe(gulp.dest(path.build));
-});
-
-gulp.task('copyFiles', function () {
-	return gulp.src(['src/+(images|css)/**/*'], { base: 'src/' })
-		.pipe(gulp.dest(path.build));
-});
-
-gulp.task('parseAMD', function (callback) {
-	gutil.log(
-		rjs.optimize(
-			{
-				baseUrl: path.src + 'js/lib/',
-				paths: {
-					"app": "../app"
-				},
-				name: '../../../node_modules/almond/almond',
-				include: '../app',
-				out: path.build + 'js/script.js',
-				wrap: true,
-				optimize: 'none',
-			},
-			function (buildResponse) {
-				callback();
-			},
-			callback
-		)
-	);
-});
+gulp.task('default', ['browserify', 'copy']);
+gulp.task('browserify', bundle);
+gulp.task('copy', () =>
+	gulp.src('src/**/*.{html,css}')
+	.pipe(gulp.dest('dist/')));
 
