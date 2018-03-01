@@ -4,6 +4,7 @@ var gutil = require('gulp-util');
 var rjs = require('requirejs');
 var replace = require('gulp-replace');
 var clean = require('gulp-clean');
+var less = require('gulp-less');
 
 
 var path = {
@@ -15,7 +16,7 @@ var path = {
 gulp.task('default', ['clean'], function () {
 	gulp.start('build');
 });
-gulp.task('build', ['copyHTML', 'copyFiles', 'parseAMD']);
+gulp.task('build', ['copyHTML', 'copyFiles', 'parseAMD', 'less']);
 
 
 gulp.task('clean', function () {
@@ -30,9 +31,15 @@ gulp.task('copyHTML', function () {
 });
 
 gulp.task('copyFiles', function () {
-	return gulp.src(['src/+(images|css)/**/*'], { base: 'src/' })
+	return gulp.src(['src/+(images)/**/*'], { base: 'src/' })
 		.pipe(gulp.dest(path.build));
 });
+
+gulp.task('less', function () {
+	return gulp.src(['src/less/**/*.less'], { base: 'src/less/' })
+		.pipe(less())
+		.pipe(gulp.dest(path.build + 'css/'));
+})
 
 gulp.task('parseAMD', function (callback) {
 	gutil.log(
