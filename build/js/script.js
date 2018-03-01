@@ -1,11 +1,10 @@
-(function () {/**
- * @license almond 0.2.9 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/jrburke/almond for details
+(function () {
+/**
+ * @license almond 0.3.3 Copyright jQuery Foundation and other contributors.
+ * Released under MIT license, http://github.com/requirejs/almond/LICENSE
  */
 //Going sloppy to avoid 'use strict' string cost, but strict practices should
 //be followed.
-/*jslint sloppy: true */
 /*global setTimeout: false */
 
 var requirejs, require, define;
@@ -33,62 +32,58 @@ var requirejs, require, define;
      */
     function normalize(name, baseName) {
         var nameParts, nameSegment, mapValue, foundMap, lastIndex,
-            foundI, foundStarMap, starI, i, j, part,
+            foundI, foundStarMap, starI, i, j, part, normalizedBaseParts,
             baseParts = baseName && baseName.split("/"),
             map = config.map,
             starMap = (map && map['*']) || {};
 
         //Adjust any relative paths.
-        if (name && name.charAt(0) === ".") {
-            //If have a base name, try to normalize against it,
-            //otherwise, assume it is a top-level require that will
-            //be relative to baseUrl in the end.
-            if (baseName) {
+        if (name) {
+            name = name.split('/');
+            lastIndex = name.length - 1;
+
+            // If wanting node ID compatibility, strip .js from end
+            // of IDs. Have to do this here, and not in nameToUrl
+            // because node allows either .js or non .js to map
+            // to same file.
+            if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
+                name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
+            }
+
+            // Starts with a '.' so need the baseName
+            if (name[0].charAt(0) === '.' && baseParts) {
                 //Convert baseName to array, and lop off the last part,
-                //so that . matches that "directory" and not name of the baseName's
-                //module. For instance, baseName of "one/two/three", maps to
-                //"one/two/three.js", but we want the directory, "one/two" for
+                //so that . matches that 'directory' and not name of the baseName's
+                //module. For instance, baseName of 'one/two/three', maps to
+                //'one/two/three.js', but we want the directory, 'one/two' for
                 //this normalization.
-                baseParts = baseParts.slice(0, baseParts.length - 1);
-                name = name.split('/');
-                lastIndex = name.length - 1;
+                normalizedBaseParts = baseParts.slice(0, baseParts.length - 1);
+                name = normalizedBaseParts.concat(name);
+            }
 
-                // Node .js allowance:
-                if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
-                    name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
-                }
-
-                name = baseParts.concat(name);
-
-                //start trimDots
-                for (i = 0; i < name.length; i += 1) {
-                    part = name[i];
-                    if (part === ".") {
-                        name.splice(i, 1);
-                        i -= 1;
-                    } else if (part === "..") {
-                        if (i === 1 && (name[2] === '..' || name[0] === '..')) {
-                            //End of the line. Keep at least one non-dot
-                            //path segment at the front so it can be mapped
-                            //correctly to disk. Otherwise, there is likely
-                            //no path mapping for a path starting with '..'.
-                            //This can still fail, but catches the most reasonable
-                            //uses of ..
-                            break;
-                        } else if (i > 0) {
-                            name.splice(i - 1, 2);
-                            i -= 2;
-                        }
+            //start trimDots
+            for (i = 0; i < name.length; i++) {
+                part = name[i];
+                if (part === '.') {
+                    name.splice(i, 1);
+                    i -= 1;
+                } else if (part === '..') {
+                    // If at the start, or previous value is still ..,
+                    // keep them so that when converted to a path it may
+                    // still work when converted to a path, even though
+                    // as an ID it is less than ideal. In larger point
+                    // releases, may be better to just kick out an error.
+                    if (i === 0 || (i === 1 && name[2] === '..') || name[i - 1] === '..') {
+                        continue;
+                    } else if (i > 0) {
+                        name.splice(i - 1, 2);
+                        i -= 2;
                     }
                 }
-                //end trimDots
-
-                name = name.join("/");
-            } else if (name.indexOf('./') === 0) {
-                // No baseName, so this is ID is resolved relative
-                // to baseUrl, pull off the leading dot.
-                name = name.substring(2);
             }
+            //end trimDots
+
+            name = name.join('/');
         }
 
         //Apply map config if available.
@@ -150,7 +145,15 @@ var requirejs, require, define;
             //A version of a require function that passes a moduleName
             //value for items that may need to
             //look up paths relative to the moduleName
-            return req.apply(undef, aps.call(arguments, 0).concat([relName, forceSync]));
+            var args = aps.call(arguments, 0);
+
+            //If first arg is not require('string'), and there is only
+            //one arg, it is the array form without a callback. Insert
+            //a null so that the following concat is correct.
+            if (typeof args[0] !== 'string' && args.length === 1) {
+                args.push(null);
+            }
+            return req.apply(undef, args.concat([relName, forceSync]));
         };
     }
 
@@ -193,32 +196,39 @@ var requirejs, require, define;
         return [prefix, name];
     }
 
+    //Creates a parts array for a relName where first part is plugin ID,
+    //second part is resource ID. Assumes relName has already been normalized.
+    function makeRelParts(relName) {
+        return relName ? splitPrefix(relName) : [];
+    }
+
     /**
      * Makes a name map, normalizing the name, and using a plugin
      * for normalization if necessary. Grabs a ref to plugin
      * too, as an optimization.
      */
-    makeMap = function (name, relName) {
+    makeMap = function (name, relParts) {
         var plugin,
             parts = splitPrefix(name),
-            prefix = parts[0];
+            prefix = parts[0],
+            relResourceName = relParts[1];
 
         name = parts[1];
 
         if (prefix) {
-            prefix = normalize(prefix, relName);
+            prefix = normalize(prefix, relResourceName);
             plugin = callDep(prefix);
         }
 
         //Normalize according
         if (prefix) {
             if (plugin && plugin.normalize) {
-                name = plugin.normalize(name, makeNormalize(relName));
+                name = plugin.normalize(name, makeNormalize(relResourceName));
             } else {
-                name = normalize(name, relName);
+                name = normalize(name, relResourceName);
             }
         } else {
-            name = normalize(name, relName);
+            name = normalize(name, relResourceName);
             parts = splitPrefix(name);
             prefix = parts[0];
             name = parts[1];
@@ -265,13 +275,14 @@ var requirejs, require, define;
     };
 
     main = function (name, deps, callback, relName) {
-        var cjsModule, depName, ret, map, i,
+        var cjsModule, depName, ret, map, i, relParts,
             args = [],
             callbackType = typeof callback,
             usingExports;
 
         //Use name if no relName
         relName = relName || name;
+        relParts = makeRelParts(relName);
 
         //Call the callback to define the module, if necessary.
         if (callbackType === 'undefined' || callbackType === 'function') {
@@ -280,7 +291,7 @@ var requirejs, require, define;
             //Default to [require, exports, module] if no deps
             deps = !deps.length && callback.length ? ['require', 'exports', 'module'] : deps;
             for (i = 0; i < deps.length; i += 1) {
-                map = makeMap(deps[i], relName);
+                map = makeMap(deps[i], relParts);
                 depName = map.f;
 
                 //Fast path CommonJS standard dependencies.
@@ -336,7 +347,7 @@ var requirejs, require, define;
             //deps arg is the module name, and second arg (if passed)
             //is just the relName.
             //Normalize module name, if it contains . or ..
-            return callDep(makeMap(deps, callback).f);
+            return callDep(makeMap(deps, makeRelParts(callback)).f);
         } else if (!deps.splice) {
             //deps is a config object, not an array.
             config = deps;
@@ -400,6 +411,9 @@ var requirejs, require, define;
     requirejs._defined = defined;
 
     define = function (name, deps, callback) {
+        if (typeof name !== 'string') {
+            throw new Error('See almond README: incorrect module build, no module name');
+        }
 
         //This module may not have dependencies
         if (!deps.splice) {
@@ -429,7 +443,7 @@ define("../../../node_modules/almond/almond", function(){});
 
 
 define('agj/to',['require'],function (require) {
-	
+	'use strict';
 
 	function call(methodName, args) {
 		args = args || [];
@@ -453,7 +467,7 @@ define('agj/to',['require'],function (require) {
 
 
 define( 'agj/utils/toArray',[],function () {
-	
+	'use strict';
 
 	return Function.prototype.call.bind(Array.prototype.slice); // Can still pass in parameters if we need only a subset of the indices!
 
@@ -461,7 +475,7 @@ define( 'agj/utils/toArray',[],function () {
 
 
 define( 'agj/function/sequence',['require','../utils/toArray'],function (require) {
-	
+	'use strict';
 
 	var toArray = require('../utils/toArray');
 
@@ -483,7 +497,7 @@ define( 'agj/function/sequence',['require','../utils/toArray'],function (require
 
 
 define( 'agj/function/parameters',['require','../to','../function/sequence'],function (require) {
-	
+	'use strict';
 
 	var to = require('../to');
 	var sequence = require('../function/sequence');
@@ -509,7 +523,7 @@ define( 'agj/function/parameters',['require','../to','../function/sequence'],fun
 
 
 define( 'agj/function/overload',['require','../utils/toArray'],function (require) {
-	
+	'use strict';
 
 	var toArray = require('../utils/toArray');
 
@@ -523,14 +537,14 @@ define( 'agj/function/overload',['require','../utils/toArray'],function (require
 
 	function overload(target, predicates, over) {
 		if (isFn(target)) {
-			var allowsRest = last(predicates) === rest;
+			var allowsRest = last(predicates) === REST;
 			return function overloaded() {
 				if (!allowsRest && arguments.length !== predicates.length) return target.apply(this, arguments);
 				var i = -1;
 				var len = predicates.length;
 				while (++i < len) {
 					var predicate = predicates[i];
-					if (allowsRest && predicate === rest) break;
+					if (allowsRest && predicate === REST) break;
 					if (!predicate(arguments[i])) return target.apply(this, arguments);
 				}
 				return over.apply(this, arguments);
@@ -539,7 +553,7 @@ define( 'agj/function/overload',['require','../utils/toArray'],function (require
 
 		var current = last(arguments);
 		var list = isFn(current) ? toArray(arguments, 0, -1) : toArray(arguments);
-		if (!isFn(current)) current = function () {};
+		if (!isFn(current)) current = function () { throw new Error("Illegal arguments passed to function."); };
 
 		var i = list.length;
 		while (--i >= 0) {
@@ -549,8 +563,8 @@ define( 'agj/function/overload',['require','../utils/toArray'],function (require
 		return current;
 	}
 
-	var rest = {};
-	Object.defineProperty(overload, 'rest', { value: rest });
+	var REST = {};
+	Object.defineProperty(overload, 'REST', { value: REST });
 
 	return overload;
 
@@ -558,14 +572,14 @@ define( 'agj/function/overload',['require','../utils/toArray'],function (require
 
 
 define( 'agj/function/autoCurryArityFn',['require','./overload'],function (require) {
-	
+	'use strict';
 
 	var overload = require('./overload');
 
 	function isFn(obj) {
 		return typeof obj === 'function';
 	}
-	function isNumber(obj) {
+	function isArity(obj) {
 		return typeof obj === 'number';
 	}
 
@@ -574,27 +588,17 @@ define( 'agj/function/autoCurryArityFn',['require','./overload'],function (requi
 			[[isFn], function (fn) {
 				return target(fn.length, fn);
 			}],
-			[[isNumber, isFn, overload.rest], target],
-			[[isFn, isNumber, overload.rest], function (fn, arity) {
+			[[isArity, isFn, overload.REST], target],
+			[[isFn, isArity, overload.REST], function (fn, arity) {
 				return target(arity, fn);
 			}],
-			[[isNumber], function (arity) {
+			[[isArity], function (arity) {
 				return function (fn) {
 					return target(arity, fn);
 				};
 			}],
 			target
 		);
-
-		// return function autoCurriedArityFn(arity, fn) {
-		// 	if (typeof arity === 'function') {
-		// 		fn = arity;
-		// 		return target(fn.length, fn);
-		// 	} else if (fn) {
-		// 		return target(arity, fn);
-		// 	}
-		// 	return function (fn) { return target(arity, fn); };
-		// };
 	}
 
 	return autoCurryArityFn;
@@ -603,7 +607,7 @@ define( 'agj/function/autoCurryArityFn',['require','./overload'],function (requi
 
 
 define( 'agj/function/autoCurry',['require','./autoCurryArityFn','../utils/toArray'],function (require) {
-	
+	'use strict';
 
 	var autoCurryArityFn = require('./autoCurryArityFn');
 	var toArray = require('../utils/toArray');
@@ -630,7 +634,7 @@ define( 'agj/function/autoCurry',['require','./autoCurryArityFn','../utils/toArr
 
 
 define( 'agj/object/values',['require'],function (require) {
-	
+	'use strict';
 
 	function values(obj) {
 		var result = [];
@@ -645,8 +649,23 @@ define( 'agj/object/values',['require'],function (require) {
 });
 
 
+define( 'agj/object/isEmpty',['require'],function (require) {
+	'use strict';
+
+	function isEmpty(obj) {
+		for (var key in obj) {
+			if (obj.hasOwnProperty(key)) return false;
+		}
+		return true;
+	}
+
+	return isEmpty;
+
+});
+
+
 define( 'agj/is/array',[],function () {
-	
+	'use strict';
 
 	var array = Array.isArray || function (object) {
 		return toString(object) === '[object Array]';
@@ -657,19 +676,30 @@ define( 'agj/is/array',[],function () {
 });
 
 
-define( 'agj/is',['require','./function/autoCurry','./object/values','./is/array'],function (require) {
-	
+define( 'agj/is',['require','./function/autoCurry','./object/values','./object/isEmpty','./is/array'],function (require) {
+	'use strict';
 
 	var autoCurry = require('./function/autoCurry');
 	var values = require('./object/values');
+	var objIsEmpty = require('./object/isEmpty');
 
 	var isArray = require('./is/array');
 
 
 	var toString = Object.prototype.toString.call.bind(Object.prototype.toString);
 
+	function exists(object) {
+		return object !== void 0 && object !== null && (typeof object !== 'number' || !isNaN(object));
+	}
+
 	function set(object) {
-		return object !== void 0 && object !== null && object !== '' && (typeof object !== 'number' || !isNaN(object));
+		return exists(object) && object !== '';
+	}
+
+	function empty(object) {
+		return !set(object) ||
+			(isArray(object) && object.length === 0) ||
+			(objectLiteral(object) && objIsEmpty(object));
 	}
 
 	function undef(object) {
@@ -697,7 +727,7 @@ define( 'agj/is',['require','./function/autoCurry','./object/values','./is/array
 	}
 
 	function objectLiteral(object) {
-		return object && typeof object === 'object' && Object.getPrototypeOf(object) === Object.prototype;
+		return !!object && typeof object === 'object' && Object.getPrototypeOf(object) === Object.prototype;
 	}
 
 	var instanceOf = autoCurry(function instanceOf(type, object) { return object instanceof type; });
@@ -723,6 +753,8 @@ define( 'agj/is',['require','./function/autoCurry','./object/values','./is/array
 		boolean: boolean,
 		array: isArray,
 		date: date,
+		empty: empty,
+		exists: exists,
 		eq: equal,
 		equal: equal,
 		fn: fn,
@@ -747,7 +779,7 @@ define( 'agj/is',['require','./function/autoCurry','./object/values','./is/array
 
 
 define( 'agj/domGenerator/anyEl',['require','../to','../is','../utils/toArray','../function/sequence'],function (require) {
-	
+	'use strict';
 
 	var to = require('../to');
 	var is = require('../is');
@@ -802,7 +834,7 @@ define( 'agj/domGenerator/anyEl',['require','../to','../is','../utils/toArray','
  * which should be a string or number to serialize correctly.
  */
 define( 'agj/function/memoize',['require'],function (require) {
-	
+	'use strict';
 
 	function memoize(fn) {
 		var memo = {};
@@ -821,7 +853,7 @@ define( 'agj/function/memoize',['require'],function (require) {
  * It is memoized for improved performance.
  */
 define( 'agj/domGenerator/toEl',['require','../is','./anyEl','../utils/toArray','../function/memoize'],function (require) {
-	
+	'use strict';
 
 	var is = require('../is');
 	var anyEl = require('./anyEl');
@@ -847,7 +879,7 @@ define( 'agj/domGenerator/toEl',['require','../is','./anyEl','../utils/toArray',
 
 
 define( 'agj/domGenerator/inject',['require','../function/parameters','./toEl'],function (require) {
-	
+	'use strict';
 
 	var parameters = require('../function/parameters');
 	var toEl = require('./toEl');
@@ -878,7 +910,7 @@ define( 'agj/domGenerator/inject',['require','../function/parameters','./toEl'],
  * function (arg2, arg0, arg1) { }
  */
 define( 'agj/function/promoteArg',['require','../utils/toArray','./autoCurry'],function (require) {
-	
+	'use strict';
 
 	var toArray = require('../utils/toArray');
 	var autoCurry = require('./autoCurry');
@@ -899,7 +931,7 @@ define( 'agj/function/promoteArg',['require','../utils/toArray','./autoCurry'],f
 
 
 define('agj/utils/log',['require'],function (require) {
-	
+	'use strict';
 
 	var log = console && console.log ? console.log.bind(console) : function () {};
 	// function log() {
@@ -926,12 +958,14 @@ define( 'agj/random/integer',['require'],function (require) {
 });
 
 
-define( 'agj/array/has',['require'],function (require) {
-	
+define( 'agj/array/has',['require','../function/autoCurry'],function (require) {
+	'use strict';
 
-	function has(arr, item) {
+	var autoCurry = require('../function/autoCurry');
+
+	var has = autoCurry( function (item, arr) {
 		return arr.indexOf(item) !== -1;
-	}
+	});
 
 	return has;
 	
@@ -966,11 +1000,11 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 		swappableLetterNodes = main.find('span.char.swap').toArray();
 		processLetterNodes(letterNodes); // Adds zero-width spaces after each character, so words may wrap at any position.
 		updateLineBreaks(); // Finds where the text breaks, so as later not to make changes to the text that would alter its flow on the page.
-		
+
 		setInterval( function () {
 			swapLetterPair();
 		}, cfg.letterSwapInterval);
-		
+
 		window.addEventListener('resize', function () {
 			if (!lineBreaksDirty) {
 				lineBreaksDirty = true;
@@ -989,7 +1023,7 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 	var swapTurn = 0;
 
 	/////
-	
+
 	function getTextNodes(parent) {
 		var results = [];
 		$(parent).contents()
@@ -1003,7 +1037,7 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 	function processLetterNodes(letterNodes) {
 		$(letterNodes).append('&#8203;<wbr/>');
 	}
-	
+
 	function updateLineBreaks() {
 		lineBreaks = [];
 		var prevYPos = $(letterNodes[0]).position().top;
@@ -1018,9 +1052,9 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 		addHardBreaks();
 		lineBreaksDirty = false;
 	}
-	
+
 	/////
-	
+
 	function putLettersIntoSpans(textNode) {
 		var text = fixWhitespace(textNode.data);
 		return makeDOM( function (span) {
@@ -1033,19 +1067,19 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 			return span.apply(null, chars);
 		});
 	}
-	
+
 	function swapLetterPair() {
 		if (lineBreaksDirty)
 			updateLineBreaks();
-		
+
 		var pos = randomInt(swappableLetterNodes.length - 1);
 		while (isCharBeforeBreak(swappableLetterNodes[pos])) {
 			pos = (pos + 1) % (swappableLetterNodes.length - 1);
 		}
-		
+
 		var nodeA = $(swappableLetterNodes[pos]);
 		var nodeB = $(swappableLetterNodes[pos + 1]);
-		
+
 		var temp = nodeA.html();
 		nodeA.html(nodeB.html());
 		nodeB.html(temp);
@@ -1054,7 +1088,7 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 		nodeB.addClass('swapped turn' + (swapTurn % 4 + 1));
 		swapTurn++;
 	}
-	
+
 	function addHardBreaks() {
 		var i = -1, len = lineBreaks.length;
 		while (++i < len - 1) {
@@ -1064,16 +1098,16 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 			}
 		}
 	}
-	
+
 	function removeHardBreaks() {
 		$('#main br.break').remove();
 	}
-	
+
 	function fixWhitespace(text) {
 		if (!text) return "";
 		return text.replace(/\s+/g, " ");
 	}
-	
+
 	function isSwappableChar(letter) {
 		return (letter.search(/\w/) === 0);
 	}
@@ -1083,8 +1117,8 @@ define( 'app/main',['require','jquery','agj/domGenerator/inject','agj/function/s
 		var nextPos = pos;
 		var lnLen = letterNodes.length;
 		while (++nextPos < lnLen) {
-			if (inArray(lineBreaks, nextPos)) return true;
-			if (inArray(swappableLetterNodes, letterNodes[nextPos])) return false;
+			if (inArray(nextPos, lineBreaks)) return true;
+			if (inArray(letterNodes[nextPos], swappableLetterNodes)) return false;
 		}
 		return true;
 	}

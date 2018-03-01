@@ -27,11 +27,11 @@ define( function(require) {
 		swappableLetterNodes = main.find('span.char.swap').toArray();
 		processLetterNodes(letterNodes); // Adds zero-width spaces after each character, so words may wrap at any position.
 		updateLineBreaks(); // Finds where the text breaks, so as later not to make changes to the text that would alter its flow on the page.
-		
+
 		setInterval( function () {
 			swapLetterPair();
 		}, cfg.letterSwapInterval);
-		
+
 		window.addEventListener('resize', function () {
 			if (!lineBreaksDirty) {
 				lineBreaksDirty = true;
@@ -50,7 +50,7 @@ define( function(require) {
 	var swapTurn = 0;
 
 	/////
-	
+
 	function getTextNodes(parent) {
 		var results = [];
 		$(parent).contents()
@@ -64,7 +64,7 @@ define( function(require) {
 	function processLetterNodes(letterNodes) {
 		$(letterNodes).append('&#8203;<wbr/>');
 	}
-	
+
 	function updateLineBreaks() {
 		lineBreaks = [];
 		var prevYPos = $(letterNodes[0]).position().top;
@@ -79,9 +79,9 @@ define( function(require) {
 		addHardBreaks();
 		lineBreaksDirty = false;
 	}
-	
+
 	/////
-	
+
 	function putLettersIntoSpans(textNode) {
 		var text = fixWhitespace(textNode.data);
 		return makeDOM( function (span) {
@@ -94,19 +94,19 @@ define( function(require) {
 			return span.apply(null, chars);
 		});
 	}
-	
+
 	function swapLetterPair() {
 		if (lineBreaksDirty)
 			updateLineBreaks();
-		
+
 		var pos = randomInt(swappableLetterNodes.length - 1);
 		while (isCharBeforeBreak(swappableLetterNodes[pos])) {
 			pos = (pos + 1) % (swappableLetterNodes.length - 1);
 		}
-		
+
 		var nodeA = $(swappableLetterNodes[pos]);
 		var nodeB = $(swappableLetterNodes[pos + 1]);
-		
+
 		var temp = nodeA.html();
 		nodeA.html(nodeB.html());
 		nodeB.html(temp);
@@ -115,7 +115,7 @@ define( function(require) {
 		nodeB.addClass('swapped turn' + (swapTurn % 4 + 1));
 		swapTurn++;
 	}
-	
+
 	function addHardBreaks() {
 		var i = -1, len = lineBreaks.length;
 		while (++i < len - 1) {
@@ -125,16 +125,16 @@ define( function(require) {
 			}
 		}
 	}
-	
+
 	function removeHardBreaks() {
 		$('#main br.break').remove();
 	}
-	
+
 	function fixWhitespace(text) {
 		if (!text) return "";
 		return text.replace(/\s+/g, " ");
 	}
-	
+
 	function isSwappableChar(letter) {
 		return (letter.search(/\w/) === 0);
 	}
@@ -144,8 +144,8 @@ define( function(require) {
 		var nextPos = pos;
 		var lnLen = letterNodes.length;
 		while (++nextPos < lnLen) {
-			if (inArray(lineBreaks, nextPos)) return true;
-			if (inArray(swappableLetterNodes, letterNodes[nextPos])) return false;
+			if (inArray(nextPos, lineBreaks)) return true;
+			if (inArray(letterNodes[nextPos], swappableLetterNodes)) return false;
 		}
 		return true;
 	}
