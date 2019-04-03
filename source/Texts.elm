@@ -1,5 +1,4 @@
-
-module Texts exposing (..)
+module Texts exposing (LanguageText, english)
 
 
 type alias LanguageText =
@@ -10,7 +9,6 @@ type alias LanguageText =
 
 english : LanguageText
 english =
-    { title = "Ale Grilli's place on the web"
+    { title = "Ale Grilli’s website"
     , content = "Hi, this is a test"
     }
-
