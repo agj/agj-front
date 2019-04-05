@@ -8,6 +8,7 @@ import General exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import List.Extra exposing (..)
 
 
 
@@ -73,27 +74,9 @@ view model =
     , body =
         [ article [ class "container", lang "en" ]
             [ nav [ class "language-selection" ]
-                [ if model.language /= English then
-                    div [ class "language language-english", onClick (SetLanguage English) ]
-                        [ text "in English"
-                        ]
-
-                  else
-                    text ""
-                , if model.language /= Spanish then
-                    div [ class "language language-spanish", onClick (SetLanguage Spanish) ]
-                        [ text "en español"
-                        ]
-
-                  else
-                    text ""
-                , if model.language /= Japanese then
-                    div [ class "language language-japanese", onClick (SetLanguage Japanese) ]
-                        [ text "日本語で"
-                        ]
-
-                  else
-                    text ""
+                [ languageButton model English "english" "in English"
+                , languageButton model Spanish "spanish" "en español"
+                , languageButton model Japanese "japanese" "日本語で"
                 ]
             , content.intro
             , content.menu
@@ -101,6 +84,50 @@ view model =
             ]
         ]
     }
+
+
+languageButton : Model -> Language -> String -> String -> Html Msg
+languageButton model language languageName label =
+    div
+        [ classList
+            [ ( "language language-" ++ languageName, True )
+            , ( "selected", model.language == language )
+            ]
+        , onClick (SetLanguage language)
+        , style "right" (em (separation model language * 7.2))
+        ]
+        [ text label
+        ]
+
+
+em : Float -> String
+em amount =
+    String.fromFloat amount ++ "em"
+
+
+separation model language =
+    let
+        languages =
+            [ Japanese, Spanish, English ]
+
+        counted =
+            takeWhile (\l -> l /= language) languages
+
+        bump =
+            List.map (\l -> l /= model.language) counted
+
+        bumpAmounts =
+            List.map
+                (\v ->
+                    if v then
+                        1
+
+                    else
+                        0
+                )
+                bump
+    in
+    List.foldl (+) 0 bumpAmounts
 
 
 

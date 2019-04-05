@@ -70,15 +70,23 @@ a, a:visited {
 /* Language selection */
 
 .language-selection {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5em;
+  position: relative;
+  height: 2em;
 }
 
 .language-selection .language {
+  position: absolute;
   font-size: 0.6em;
   background-color: white;
-  display: inline-flex;
   margin: 0 0.2em;
   padding: 0.2em 0.5em;
+  width: 7em;
+  text-align: center;
+  transition-property: top, right;
+  transition-duration: 0.2s, 0.2s;
+  top: 0;
+}
+
+.language-selection .language.selected {
+  top: -2em;
 }
