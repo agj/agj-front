@@ -4,6 +4,7 @@ import Browser
 import ContentEnglish exposing (..)
 import ContentJapanese exposing (..)
 import ContentSpanish exposing (..)
+import Dict
 import General exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -31,19 +32,53 @@ main =
 
 type alias Model =
     { language : Language
+    , languageButtons :
+        { english : LanguageButtonStatus
+        , spanish : LanguageButtonStatus
+        , japanese : LanguageButtonStatus
+        }
     }
+
+
+type alias LanguageButtonStatus =
+    { adjusted : Bool }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model English, Cmd.none )
+    ( Model English
+        { english = LanguageButtonStatus False
+        , spanish = LanguageButtonStatus False
+        , japanese = LanguageButtonStatus False
+        }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SetLanguage language ->
-            ( { model | language = language }, Cmd.none )
+        SetLanguage newLanguage ->
+            let
+                previousLanguage =
+                    model.language
+
+                setButton thisLanguage =
+                    LanguageButtonStatus (buttonAdjusted thisLanguage)
+
+                buttonAdjusted thisLanguage =
+                    (thisLanguage == Spanish)
+                        && ((previousLanguage == Spanish && newLanguage == Japanese)
+                                || (previousLanguage == Japanese && newLanguage == Spanish)
+                           )
+            in
+            ( Model newLanguage
+                { english = setButton English
+                , spanish = setButton Spanish
+                , japanese = setButton Japanese
+                }
+            , Cmd.none
+            )
 
 
 
@@ -88,13 +123,39 @@ view model =
 
 languageButton : Model -> Language -> String -> String -> Html Msg
 languageButton model language languageName label =
+    let
+        currentLanguage =
+            model.language
+
+        buttonStatus l =
+            case l of
+                English ->
+                    model.languageButtons.english
+
+                Spanish ->
+                    model.languageButtons.spanish
+
+                Japanese ->
+                    model.languageButtons.japanese
+
+        isAdjusted l =
+            (buttonStatus l).adjusted
+
+        separation =
+            [ Japanese, Spanish, English ]
+                |> takeWhile (negate (equals language))
+                |> List.filter (neither (equals currentLanguage) isAdjusted)
+                |> List.map (always 1)
+                |> List.foldl (+) 0
+    in
     div
         [ classList
             [ ( "language language-" ++ languageName, True )
-            , ( "selected", model.language == language )
+            , ( "selected", currentLanguage == language )
+            , ( "adjusted", (buttonStatus language).adjusted )
             ]
         , onClick (SetLanguage language)
-        , style "right" (em (separation model language * 7.2))
+        , style "right" (em (separation * 7.2))
         ]
         [ text label
         ]
@@ -105,29 +166,29 @@ em amount =
     String.fromFloat amount ++ "em"
 
 
-separation model language =
-    let
-        languages =
-            [ Japanese, Spanish, English ]
+equals : a -> a -> Bool
+equals a b =
+    a == b
 
-        counted =
-            takeWhile (\l -> l /= language) languages
 
-        bump =
-            List.map (\l -> l /= model.language) counted
+negate : (a -> Bool) -> a -> Bool
+negate f value =
+    not (f value)
 
-        bumpAmounts =
-            List.map
-                (\v ->
-                    if v then
-                        1
 
-                    else
-                        0
-                )
-                bump
-    in
-    List.foldl (+) 0 bumpAmounts
+both : (a -> Bool) -> (a -> Bool) -> a -> Bool
+both f g value =
+    f value && g value
+
+
+neither : (a -> Bool) -> (a -> Bool) -> a -> Bool
+neither f g value =
+    not (f value) && not (g value)
+
+
+either : (a -> Bool) -> (a -> Bool) -> a -> Bool
+either f g value =
+    f value || g value
 
 
 

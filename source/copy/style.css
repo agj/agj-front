@@ -82,11 +82,33 @@ a, a:visited {
   padding: 0.2em 0.5em;
   width: 7em;
   text-align: center;
-  transition-property: top, right;
-  transition-duration: 0.2s, 0.2s;
   top: 0;
+
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+  animation-name: enter;
 }
 
 .language-selection .language.selected {
-  top: -2em;
+  animation-name: leave;
 }
+
+.language-selection .language.adjusted {
+  transition-property: right;
+  transition-duration: 0.2s;
+}
+
+@keyframes leave {
+  100% {
+    top: -2em;
+  }
+}
+@keyframes enter {
+  100% {
+    top: 0;
+  }
+}
+
+
+
+
