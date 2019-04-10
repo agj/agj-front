@@ -12,7 +12,7 @@ contentSpanish =
             "Ale Grilli"
             " (a veces "
             "agj"
-            "). Soy un «creador transmedial»—desde Chile programo medios interactivos, diseño gráfica, creo videos, y otras cosas. También soy un fanático de los idiomas. Me puedes contactar por medio de "
+            "). Soy un «creador transmedial»\u{200B}—\u{200B}desde Chile programo medios interactivos, diseño gráfica, creo videos, y otras cosas. Me gustan mucho los idiomas. Me puedes contactar por medio de "
             "ale¶agj.cl"
             " (¶→@)."
     , menu = menu "Portafolio" "Blog"

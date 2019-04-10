@@ -12,7 +12,7 @@ contentEnglish =
             "Ale Grilli"
             " (a.k.a. "
             "agj"
-            ")’s home on the web. I’m a Chile-based «cross-media creator»—I program interactive media, design visuals, author videos, and more. I'm also a languages nerd. You may contact me via "
+            ")’s home on the web. I’m a Chile-based «cross-media creator»\u{200B}—\u{200B}I program interactive media, design visuals, author videos, and more. I'm also a languages nerd. You may contact me via "
             "ale¶agj.cl"
             " (¶→@)."
     , menu = menu "Portfolio" "Blog"

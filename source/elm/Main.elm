@@ -32,53 +32,20 @@ main =
 
 type alias Model =
     { language : Language
-    , languageButtons :
-        { english : LanguageButtonStatus
-        , spanish : LanguageButtonStatus
-        , japanese : LanguageButtonStatus
-        }
+    , previousLanguage : Language
     }
-
-
-type alias LanguageButtonStatus =
-    { adjusted : Bool }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model English
-        { english = LanguageButtonStatus False
-        , spanish = LanguageButtonStatus False
-        , japanese = LanguageButtonStatus False
-        }
-    , Cmd.none
-    )
+    ( Model English Spanish, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetLanguage newLanguage ->
-            let
-                previousLanguage =
-                    model.language
-
-                setButton thisLanguage =
-                    LanguageButtonStatus (buttonAdjusted thisLanguage)
-
-                buttonAdjusted thisLanguage =
-                    (thisLanguage == Spanish)
-                        && ((previousLanguage == Spanish && newLanguage == Japanese)
-                                || (previousLanguage == Japanese && newLanguage == Spanish)
-                           )
-            in
-            ( Model newLanguage
-                { english = setButton English
-                , spanish = setButton Spanish
-                , japanese = setButton Japanese
-                }
-            , Cmd.none
-            )
+            ( Model newLanguage model.language, Cmd.none )
 
 
 
@@ -109,9 +76,9 @@ view model =
     , body =
         [ article [ class "container", lang "en" ]
             [ nav [ class "language-selection" ]
-                [ languageButton model English "english" "in English"
-                , languageButton model Spanish "spanish" "en español"
-                , languageButton model Japanese "japanese" "日本語で"
+                [ languageButton model English "english"
+                , languageButton model Spanish "spanish"
+                , languageButton model Japanese "japanese"
                 ]
             , content.intro
             , content.menu
@@ -121,43 +88,47 @@ view model =
     }
 
 
-languageButton : Model -> Language -> String -> String -> Html Msg
-languageButton model language languageName label =
+languageButton : Model -> Language -> String -> Html Msg
+languageButton model language languageName =
     let
-        currentLanguage =
+        exits =
             model.language
 
-        buttonStatus l =
-            case l of
+        enters =
+            model.previousLanguage
+
+        position =
+            case language of
                 English ->
-                    model.languageButtons.english
+                    1
 
                 Spanish ->
-                    model.languageButtons.spanish
+                    if (exits == Japanese) || ((exits == Spanish) && (enters == Japanese)) then
+                        0
+
+                    else
+                        1
 
                 Japanese ->
-                    model.languageButtons.japanese
+                    0
 
-        isAdjusted l =
-            (buttonStatus l).adjusted
-
-        separation =
-            [ Japanese, Spanish, English ]
-                |> takeWhile (negate (equals language))
-                |> List.filter (neither (equals currentLanguage) isAdjusted)
-                |> List.map (always 1)
-                |> List.foldl (+) 0
+        adjusted =
+            (language == Spanish)
+                && ((enters == English && exits == Japanese)
+                        || (enters == Japanese && exits == English)
+                   )
     in
     div
         [ classList
-            [ ( "language language-" ++ languageName, True )
-            , ( "selected", currentLanguage == language )
-            , ( "adjusted", (buttonStatus language).adjusted )
+            [ ( "language", True )
+            , ( "language-" ++ languageName, True )
+            , ( "selected", model.language == language )
+            , ( "adjusted", adjusted )
+            , ( "position-" ++ String.fromInt position, True )
             ]
         , onClick (SetLanguage language)
-        , style "right" (em (separation * 7.2))
         ]
-        [ text label
+        [ text ""
         ]
 
 
