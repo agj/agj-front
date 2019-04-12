@@ -12,5 +12,5 @@ contentSpanish =
     , menu = menu "Portafolio" "Blog"
     , links =
         links
-            "También tengo un [**archivo de imágenes**][piclog]. Uso [Twitter][twitter] a veces. Mis **videos** están en [Vimeo][vimeo]. Parte de mi **código** está en [Github][github]. Una página alberga [mis **videojuegos** viejos][games]. En [Greasy Fork][greasyfork] están mis **user scripts**. Mi [Tumblr][tumblr] tiene algunas cosas que he encontrado en la web."
+            "También tengo un [**archivo de imágenes**][piclog]. Tuiteo en japonés y español en [**Japoñol**][japonol], y a veces en mi [cuenta principal][twitter]. Mis **videos** están en [Vimeo][vimeo]. Parte de mi **código** está en [Github][github]. Una página alberga [mis **videojuegos** viejos][games]. En [Greasy Fork][greasyfork] están mis **userscripts**. En mi [Tumblr][tumblr] tengo cosas raras de la web."
     }

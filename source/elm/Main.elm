@@ -45,7 +45,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetLanguage newLanguage ->
-            ( Model newLanguage model.language, Cmd.none )
+            ( if newLanguage /= model.language then
+                Model newLanguage model.language
+
+              else
+                model
+            , Cmd.none
+            )
 
 
 
