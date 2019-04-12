@@ -16,7 +16,7 @@ import List.Extra exposing (..)
 -- MAIN
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.document
         { init = init
@@ -36,9 +36,29 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Model English Spanish, Cmd.none )
+type alias Flags =
+    { languages : List String }
+
+
+languageCodes =
+    Dict.fromList
+        [ ( "en", English )
+        , ( "es", Spanish )
+        , ( "ja", Japanese )
+        ]
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    let
+        systemLanguage =
+            flags.languages
+                |> List.map (String.left 2)
+                |> find (\s -> Dict.member s languageCodes)
+                |> Maybe.andThen (\lc -> Dict.get lc languageCodes)
+                |> Maybe.withDefault English
+    in
+    ( Model systemLanguage systemLanguage, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
