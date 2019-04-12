@@ -5,7 +5,7 @@ import General exposing (..)
 
 contentJapanese : Content
 contentJapanese =
-    { title = "アレ・グリリのウェブサイト"
+    { title = "アレ・グリリのウェブ"
     , intro =
         intro
             "ようこそ、**アレ・グリリ**（Ale Grilli、別名 **agj**）のホームページへ。チリを拠点にする「メディア・クリエイター」です。インタラクティブ・メディアのプログラミングや、視覚デザイン、映像制作、などに手掛ける者です。さらに言えば言語オタクです。ご連絡は “ale¶agj.cl”（¶→@）までお願いします。"
