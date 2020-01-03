@@ -11,7 +11,7 @@ const copy = () =>
 	.pipe(gulp.dest('build/'));
 
 const formatElm = () =>
-	exec('elm-format source/elm/ --yes');
+	exec('npx elm-format source/elm/ --yes');
 
 const buildElm = () =>
 	gulp.src('source/elm/Main.elm')
