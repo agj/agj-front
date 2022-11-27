@@ -47,6 +47,7 @@ languageCodes =
         [ ( "en", English )
         , ( "es", Spanish )
         , ( "ja", Japanese )
+        , ( "zh", Mandarin )
         ]
 
 
@@ -96,9 +97,10 @@ view model =
     , body =
         [ article [ class "container", lang "en" ]
             [ nav [ class "language-selection" ]
-                [ languageButton model English "english"
-                , languageButton model Spanish "spanish"
+                [ languageButton model Spanish "spanish"
+                , languageButton model English "english"
                 , languageButton model Japanese "japanese"
+                , languageButton model Mandarin "mandarin"
                 ]
             , content.intro
             , content.menu
@@ -117,26 +119,55 @@ languageButton model language languageName =
         enters =
             model.previousLanguage
 
-        position =
+        -- As indices starting from the right.
+        -- Assumes this order: es, en, ja, zh.
+        ( previousPosition, position ) =
             case language of
-                English ->
-                    1
-
                 Spanish ->
-                    if (exits == Japanese) || ((exits == Spanish) && (enters == Japanese)) then
-                        0
+                    ( 2, 2 )
 
-                    else
-                        1
+                English ->
+                    case ( enters, exits ) of
+                        ( Spanish, English ) ->
+                            ( 2, 2 )
+
+                        ( English, Spanish ) ->
+                            ( 2, 2 )
+
+                        ( Spanish, _ ) ->
+                            ( 2, 1 )
+
+                        ( English, _ ) ->
+                            ( 1, 1 )
+
+                        ( _, Spanish ) ->
+                            ( 1, 2 )
+
+                        ( _, _ ) ->
+                            ( 1, 1 )
 
                 Japanese ->
-                    0
+                    case ( enters, exits ) of
+                        ( Japanese, Mandarin ) ->
+                            ( 0, 0 )
+
+                        ( Mandarin, Japanese ) ->
+                            ( 0, 0 )
+
+                        ( _, Mandarin ) ->
+                            ( 1, 0 )
+
+                        ( Mandarin, _ ) ->
+                            ( 0, 1 )
+
+                        ( _, _ ) ->
+                            ( 1, 1 )
+
+                Mandarin ->
+                    ( 0, 0 )
 
         adjusted =
-            (language == Spanish)
-                && ((enters == English && exits == Japanese)
-                        || (enters == Japanese && exits == English)
-                   )
+            position /= previousPosition
     in
     div
         [ classList

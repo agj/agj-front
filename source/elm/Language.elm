@@ -5,3 +5,4 @@ type Language
     = English
     | Spanish
     | Japanese
+    | Mandarin

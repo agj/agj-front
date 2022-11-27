@@ -1,5 +1,10 @@
 /* General */
 
+:root {
+  --language-width: 7em;
+  --language-distance: calc(var(--language-width) + 0.2em);
+}
+
 :root,
 body {
   font-family: "Arvo", "M+ Type-1", "Helvetica", sans-serif;
@@ -49,7 +54,7 @@ a:visited {
   position: absolute;
   right: 0;
   top: 0;
-  width: 7em;
+  width: var(--language-width);
   margin: 0 0.2em;
   padding: 0.2em 0.5em;
   font-size: 0.6em;
@@ -70,6 +75,9 @@ a:visited {
 .language-selection .language.language-japanese::after {
   content: "日本語で";
 }
+.language-selection .language.language-mandarin::after {
+  content: "中文";
+}
 
 .language-selection .language.selected {
   top: -2em;
@@ -80,8 +88,11 @@ a:visited {
   transition-duration: 0.2s, 0.2s;
 }
 
+.language-selection .language.position-2 {
+  right: calc(var(--language-distance) * 2);
+}
 .language-selection .language.position-1 {
-  right: 7.2em;
+  right: calc(var(--language-distance) * 1);
 }
 .language-selection .language.position-0 {
   right: 0;
@@ -91,17 +102,13 @@ a:visited {
 
 /* Breakpoint: XS */
 @media (max-width: 400px) {
+  :root {
+    --language-width: 3em;
+  }
+
   :root,
   body {
     font-size: 16pt;
-  }
-
-  .language-selection .language {
-    width: 3em;
-  }
-
-  .language-selection .language.position-1 {
-    right: 3.2em;
   }
 
   .language-selection .language.language-english::after {
@@ -112,6 +119,9 @@ a:visited {
   }
   .language-selection .language.language-japanese::after {
     content: "日";
+  }
+  .language-selection .language.language-mandarin::after {
+    content: "中";
   }
 }
 
