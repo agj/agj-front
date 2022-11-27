@@ -1,9 +1,7 @@
 module Main exposing (Document, Model, init, main, subscriptions, update, view)
 
 import Browser
-import ContentEnglish exposing (..)
-import ContentJapanese exposing (..)
-import ContentSpanish exposing (..)
+import Content
 import Dict
 import General exposing (..)
 import Html exposing (..)
@@ -88,15 +86,7 @@ view : Model -> Document Msg
 view model =
     let
         content =
-            case model.language of
-                English ->
-                    contentEnglish
-
-                Spanish ->
-                    contentSpanish
-
-                Japanese ->
-                    contentJapanese
+            Content.fromLanguage model.language
     in
     { title = content.title
     , body =
