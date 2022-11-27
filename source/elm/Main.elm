@@ -152,36 +152,6 @@ languageButton model language languageName =
         ]
 
 
-em : Float -> String
-em amount =
-    String.fromFloat amount ++ "em"
-
-
-equals : a -> a -> Bool
-equals a b =
-    a == b
-
-
-negate : (a -> Bool) -> a -> Bool
-negate f value =
-    not (f value)
-
-
-both : (a -> Bool) -> (a -> Bool) -> a -> Bool
-both f g value =
-    f value && g value
-
-
-neither : (a -> Bool) -> (a -> Bool) -> a -> Bool
-neither f g value =
-    not (f value) && not (g value)
-
-
-either : (a -> Bool) -> (a -> Bool) -> a -> Bool
-either f g value =
-    f value || g value
-
-
 
 -- SUBSCRIPTIONS
 
