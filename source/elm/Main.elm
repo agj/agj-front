@@ -97,11 +97,12 @@ view model =
     , body =
         [ article [ class "container", lang "en" ]
             [ nav [ class "language-selection" ]
-                [ languageButton model Spanish "spanish"
-                , languageButton model English "english"
-                , languageButton model Japanese "japanese"
-                , languageButton model Mandarin "mandarin"
-                ]
+                (Language.all
+                    |> List.map
+                        (\language ->
+                            languageButton model language (Language.toName language)
+                        )
+                )
             , content.intro
             , content.menu
             , content.links
@@ -113,68 +114,35 @@ view model =
 languageButton : Model -> Language -> String -> Html Msg
 languageButton model language languageName =
     let
-        exits =
-            model.language
+        ( position, previousPosition ) =
+            let
+                posM =
+                    List.remove model.language Language.all
+                        |> List.elemIndex language
 
-        enters =
-            model.previousLanguage
+                prevPosM =
+                    List.remove model.previousLanguage Language.all
+                        |> List.elemIndex language
+            in
+            case ( posM, prevPosM ) of
+                ( Just pos, Just prevPos ) ->
+                    ( pos, prevPos )
 
-        -- As indices starting from the right.
-        -- Assumes this order: es, en, ja, zh.
-        ( previousPosition, position ) =
-            case language of
-                Spanish ->
-                    ( 2, 2 )
+                ( Just pos, Nothing ) ->
+                    ( pos, pos )
 
-                English ->
-                    case ( enters, exits ) of
-                        ( Spanish, English ) ->
-                            ( 2, 2 )
+                ( Nothing, Just prevPos ) ->
+                    ( prevPos, prevPos )
 
-                        ( English, Spanish ) ->
-                            ( 2, 2 )
-
-                        ( Spanish, _ ) ->
-                            ( 2, 1 )
-
-                        ( English, _ ) ->
-                            ( 1, 1 )
-
-                        ( _, Spanish ) ->
-                            ( 1, 2 )
-
-                        ( _, _ ) ->
-                            ( 1, 1 )
-
-                Japanese ->
-                    case ( enters, exits ) of
-                        ( Japanese, Mandarin ) ->
-                            ( 0, 0 )
-
-                        ( Mandarin, Japanese ) ->
-                            ( 0, 0 )
-
-                        ( _, Mandarin ) ->
-                            ( 1, 0 )
-
-                        ( Mandarin, _ ) ->
-                            ( 0, 1 )
-
-                        ( _, _ ) ->
-                            ( 1, 1 )
-
-                Mandarin ->
+                ( Nothing, Nothing ) ->
                     ( 0, 0 )
-
-        adjusted =
-            position /= previousPosition
     in
     div
         [ classList
             [ ( "language", True )
             , ( "language-" ++ languageName, True )
             , ( "selected", model.language == language )
-            , ( "adjusted", adjusted )
+            , ( "adjusted", position /= previousPosition )
             , ( "position-" ++ String.fromInt position, True )
             ]
         , onClick (SetLanguage language)
