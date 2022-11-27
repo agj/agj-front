@@ -49,3 +49,22 @@ toIsoCode language =
 
         Mandarin ->
             "zh"
+
+
+fromIsoCode : String -> Maybe Language
+fromIsoCode isoCode =
+    case isoCode of
+        "en" ->
+            Just English
+
+        "es" ->
+            Just Spanish
+
+        "ja" ->
+            Just Japanese
+
+        "zh" ->
+            Just Mandarin
+
+        _ ->
+            Nothing

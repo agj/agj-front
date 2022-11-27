@@ -42,23 +42,16 @@ type alias Flags =
     { languages : List String }
 
 
-languageCodes =
-    Dict.fromList
-        [ ( "en", English )
-        , ( "es", Spanish )
-        , ( "ja", Japanese )
-        , ( "zh", Mandarin )
-        ]
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         systemLanguage =
             flags.languages
+                |> Debug.log "lang"
                 |> List.map (String.left 2)
-                |> List.find (\s -> Dict.member s languageCodes)
-                |> Maybe.andThen (\lc -> Dict.get lc languageCodes)
+                |> List.filterMap Language.fromIsoCode
+                |> Debug.log "result"
+                |> List.head
                 |> Maybe.withDefault English
     in
     ( Model systemLanguage systemLanguage, Cmd.none )
