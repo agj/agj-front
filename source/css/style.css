@@ -1,13 +1,17 @@
 /* General */
 
+:root,
 body {
   font-family: "Arvo", "M+ Type-1", "Helvetica", sans-serif;
   font-weight: normal;
   font-size: 20pt;
   line-height: 1.5;
-  background-color: #cfff00;
   color: black;
-  padding: 0 0.7em 0.5em;
+}
+
+body {
+  background-color: #cfff00;
+  padding: 0 0.7em 3em;
 }
 
 p,
@@ -83,7 +87,15 @@ a:visited {
   right: 0;
 }
 
-@media (max-width: 300px) {
+/* Breakpoints */
+
+/* Breakpoint: XS */
+@media (max-width: 400px) {
+  :root,
+  body {
+    font-size: 16pt;
+  }
+
   .language-selection .language {
     width: 3em;
   }
