@@ -95,7 +95,10 @@ view model =
     in
     { title = content.title
     , body =
-        [ article [ class "container", lang "en" ]
+        [ article
+            [ class "container"
+            , lang (Language.toIsoCode model.language)
+            ]
             [ nav [ class "language-selection" ]
                 (Language.all
                     |> List.map

@@ -33,3 +33,19 @@ toName language =
 
         Mandarin ->
             "mandarin"
+
+
+toIsoCode : Language -> String
+toIsoCode language =
+    case language of
+        Spanish ->
+            "es"
+
+        English ->
+            "en"
+
+        Japanese ->
+            "ja"
+
+        Mandarin ->
+            "zh"
