@@ -1,4 +1,7 @@
+dist/
+
 elm-stuff/
 node_modules/
-
-build/
+.vscode/
+.parcel-cache/
+.elm-stuff/
