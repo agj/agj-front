@@ -17,11 +17,10 @@ contentEnglish =
     , links =
         links
             ("I also have a [**pictures log**][piclog]. "
-                ++ "I run a Japanese-Spanish bilingual Twitter account, [**Japoñol**][japonol], "
-                ++ "and sparingly tweet from my [main account][twitter]. "
-                ++ "My **video works** are on [Vimeo][vimeo]. "
+                ++ "Socials-wise, I barely use [Mastodon][mastodon] and [Twitter][twitter]. "
+                ++ "My **video works** are on [Vimeo][vimeo] and [Youtube][youtube]. "
                 ++ "Some of my **code** is up on [Github][github]. "
-                ++ "I have a page with [my old **games**][games]. "
+                ++ "I have a page with [my old **games**][games] in it. "
                 ++ "[Greasy Fork][greasyfork] houses my **userscripts**. "
                 ++ "My [Tumblr][tumblr] has some stuff I've found around the web."
             )

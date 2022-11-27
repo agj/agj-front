@@ -48,8 +48,9 @@ links md =
         ++ """
 
 [piclog]: //piclog.agj.cl/
-[japonol]: https://twitter.com/haponyoru
+[mastodon]: https://mstdn.social/@agj
 [twitter]: https://twitter.com/alegrilli
+[youtube]: https://youtube.com/@agjcl
 [vimeo]: https://www.vimeo.com/agj
 [github]: https://github.com/agj
 [games]: /games/

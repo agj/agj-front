@@ -18,9 +18,8 @@ contentSpanish =
     , links =
         links
             ("También tengo un [**archivo de imágenes**][piclog]. "
-                ++ "Tuiteo en japonés y español en [**Japoñol**][japonol], "
-                ++ "y a veces en mi [cuenta principal][twitter]. "
-                ++ "Mis **videos** están en [Vimeo][vimeo]. "
+                ++ "Respecto a redes sociales, apenas uso [Mastodon][mastodon] y [Twitter][twitter]. "
+                ++ "Mis **videos** están en [Vimeo][vimeo] y [Youtube][youtube]. "
                 ++ "Parte de mi **código** está en [Github][github]. "
                 ++ "Una página alberga [mis **videojuegos** viejos][games]. "
                 ++ "En [Greasy Fork][greasyfork] están mis **userscripts**. "
