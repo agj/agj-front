@@ -12,12 +12,10 @@
     <link rel="stylesheet" href="./source/css/style.css" />
   </head>
   <body>
-    <div id="elm"></div>
     <script type="module">
       import { Elm } from "./source/elm/Main.elm";
 
       const app = Elm.Main.init({
-        node: document.getElementById("elm"),
         flags: {
           languages: window.navigator.languages
             ? window.navigator.languages
