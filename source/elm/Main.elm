@@ -3,11 +3,11 @@ module Main exposing (Document, Model, init, main, subscriptions, update, view)
 import Browser
 import Content
 import Dict
-import General exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import List.Extra exposing (..)
+import Html exposing (Html, article, div, nav, text)
+import Html.Attributes exposing (class, classList, lang)
+import Html.Events exposing (onClick)
+import Language exposing (Language(..))
+import List.Extra as List
 
 
 
@@ -34,6 +34,10 @@ type alias Model =
     }
 
 
+type Msg
+    = SetLanguage Language
+
+
 type alias Flags =
     { languages : List String }
 
@@ -52,7 +56,7 @@ init flags =
         systemLanguage =
             flags.languages
                 |> List.map (String.left 2)
-                |> find (\s -> Dict.member s languageCodes)
+                |> List.find (\s -> Dict.member s languageCodes)
                 |> Maybe.andThen (\lc -> Dict.get lc languageCodes)
                 |> Maybe.withDefault English
     in

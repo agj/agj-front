@@ -5,21 +5,21 @@ module Content exposing
     , spanish
     )
 
-import General exposing (..)
 import Html exposing (Html, a, li, p, text, ul)
 import Html.Attributes exposing (class, href)
+import Language exposing (Language(..))
 import Markdown
 
 
-type alias Content =
+type alias Content msg =
     { title : String
-    , intro : Html Msg
-    , menu : Html Msg
-    , links : Html Msg
+    , intro : Html msg
+    , menu : Html msg
+    , links : Html msg
     }
 
 
-fromLanguage : Language -> Content
+fromLanguage : Language -> Content msg
 fromLanguage language =
     case language of
         English ->
@@ -36,7 +36,7 @@ fromLanguage language =
 -- CONTENT
 
 
-japanese : Content
+japanese : Content msg
 japanese =
     { title = "アレ・グリリのウェブ"
     , intro =
@@ -61,7 +61,7 @@ japanese =
     }
 
 
-english : Content
+english : Content msg
 english =
     { title = "Ale Grilli’s website"
     , intro =
@@ -85,7 +85,7 @@ english =
     }
 
 
-spanish : Content
+spanish : Content msg
 spanish =
     { title = "Web de Ale Grilli"
     , intro =
