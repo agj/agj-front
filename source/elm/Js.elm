@@ -1,4 +1,4 @@
-port module Js exposing (Notification(..), receive, requestState, saveState)
+port module Js exposing (Notification(..), requestState, saveState, subscription)
 
 import Json.Decode as D
 import Json.Encode as E
@@ -10,14 +10,14 @@ type Notification
     | Invalid
 
 
-receive : (Notification -> msg) -> Sub msg
-receive toMsg =
-    notification (parse >> toMsg)
+subscription : (Notification -> msg) -> Sub msg
+subscription toMsg =
+    portFromJs (parse >> toMsg)
 
 
 saveState : SaveState -> Cmd msg
 saveState state =
-    command
+    portToJs
         { kind = "saveState"
         , value = SaveState.encode state
         }
@@ -25,7 +25,7 @@ saveState state =
 
 requestState : Cmd msg
 requestState =
-    command
+    portToJs
         { kind = "requestState"
         , value = E.null
         }
@@ -35,25 +35,19 @@ requestState =
 -- INTERNAL
 
 
-type alias ToJs =
+type alias JsMessage =
     { kind : String
     , value : E.Value
     }
 
 
-type alias FromJs =
-    { kind : String
-    , value : E.Value
-    }
+port portToJs : JsMessage -> Cmd msg
 
 
-port command : ToJs -> Cmd msg
+port portFromJs : (JsMessage -> msg) -> Sub msg
 
 
-port notification : (FromJs -> msg) -> Sub msg
-
-
-parse : FromJs -> Notification
+parse : JsMessage -> Notification
 parse { kind, value } =
     case kind of
         "saveStateLoaded" ->

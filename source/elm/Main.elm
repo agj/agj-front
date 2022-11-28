@@ -171,4 +171,4 @@ languageButton model language languageName =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Js.receive JsNotification
+    Js.subscription JsNotification

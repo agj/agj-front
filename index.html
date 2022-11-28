@@ -29,7 +29,7 @@
 
       console.log(app);
 
-      app.ports.command.subscribe(({ kind, value }) => {
+      app.ports.portToJs.subscribe(({ kind, value }) => {
         console.log({ kind, value });
         switch (kind) {
           case "saveState":
@@ -37,7 +37,7 @@
             break;
 
           case "requestState":
-            app.ports.notification.send({
+            app.ports.portFromJs.send({
               kind: "saveStateLoaded",
               value: localStorage.getItem(saveStateKey),
             });
