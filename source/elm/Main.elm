@@ -47,10 +47,8 @@ init flags =
     let
         systemLanguage =
             flags.languages
-                |> Debug.log "lang"
                 |> List.map (String.left 2)
                 |> List.filterMap Language.fromIsoCode
-                |> Debug.log "result"
                 |> List.head
                 |> Maybe.withDefault English
     in
