@@ -27,10 +27,7 @@
 
       const saveStateKey = "home-state";
 
-      console.log(app);
-
       app.ports.portToJs.subscribe(({ kind, value }) => {
-        console.log({ kind, value });
         switch (kind) {
           case "saveState":
             localStorage.setItem(saveStateKey, value);

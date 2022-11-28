@@ -54,7 +54,6 @@ port portFromJs : (Value -> msg) -> Sub msg
 parse : Value -> Notification
 parse value =
     D.decodeValue decoder value
-        |> Debug.log "value result"
         |> Result.withDefault Invalid
 
 
