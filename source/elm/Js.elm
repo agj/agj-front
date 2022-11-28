@@ -1,6 +1,6 @@
 port module Js exposing (Notification(..), requestState, saveState, subscription)
 
-import Json.Decode as D
+import Json.Decode as D exposing (Value)
 import Json.Encode as E
 import SaveState exposing (SaveState)
 
@@ -18,17 +18,21 @@ subscription toMsg =
 saveState : SaveState -> Cmd msg
 saveState state =
     portToJs
-        { kind = "saveState"
-        , value = SaveState.encode state
-        }
+        (encode
+            { kind = "saveState"
+            , value = SaveState.encode state
+            }
+        )
 
 
 requestState : Cmd msg
 requestState =
     portToJs
-        { kind = "requestState"
-        , value = E.null
-        }
+        (encode
+            { kind = "requestState"
+            , value = E.null
+            }
+        )
 
 
 
@@ -41,22 +45,37 @@ type alias JsMessage =
     }
 
 
-port portToJs : JsMessage -> Cmd msg
+port portToJs : Value -> Cmd msg
 
 
-port portFromJs : (JsMessage -> msg) -> Sub msg
+port portFromJs : (Value -> msg) -> Sub msg
 
 
-parse : JsMessage -> Notification
-parse { kind, value } =
-    case kind of
-        "saveStateLoaded" ->
-            case D.decodeValue SaveState.decoder value of
-                Ok ss ->
-                    SaveStateLoaded ss
+parse : Value -> Notification
+parse value =
+    D.decodeValue decoder value
+        |> Debug.log "value result"
+        |> Result.withDefault Invalid
 
-                Err _ ->
-                    Invalid
 
-        _ ->
-            Invalid
+decoder : D.Decoder Notification
+decoder =
+    D.field "kind" D.string
+        |> D.andThen
+            (\kind ->
+                case kind of
+                    "saveStateLoaded" ->
+                        D.field "value" SaveState.decoder
+                            |> D.map SaveStateLoaded
+
+                    _ ->
+                        D.fail "Kind not recognized"
+            )
+
+
+encode : JsMessage -> Value
+encode jsMessage =
+    E.object
+        [ ( "kind", E.string jsMessage.kind )
+        , ( "value", jsMessage.value )
+        ]

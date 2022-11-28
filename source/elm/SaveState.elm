@@ -1,6 +1,7 @@
 module SaveState exposing (SaveState, decoder, encode)
 
 import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode.Extra as Decode
 import Json.Encode as Encode
 import Language exposing (Language)
 
@@ -21,20 +22,14 @@ encode state =
 
 decoder : Decoder SaveState
 decoder =
-    let
-        toResult =
-            Decode.decodeString
-                (Decode.map SaveState
-                    (Decode.field "language" Language.decoder)
-                )
+    Decode.doubleEncoded objectDecoder
 
-        resultDecoder res =
-            case res of
-                Ok ss ->
-                    Decode.succeed ss
 
-                Err _ ->
-                    Decode.fail "error"
-    in
-    Decode.string
-        |> Decode.andThen (toResult >> resultDecoder)
+
+-- INTERNAL
+
+
+objectDecoder : Decoder SaveState
+objectDecoder =
+    Decode.map SaveState
+        (Decode.field "language" Language.decoder)
