@@ -3,7 +3,6 @@
 button,
 button:focus,
 button:active {
-  outline: none;
   background: transparent;
   border: none;
   line-height: inherit;
