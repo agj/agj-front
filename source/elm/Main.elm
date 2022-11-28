@@ -3,7 +3,7 @@ module Main exposing (Document, Model, init, main, subscriptions, update, view)
 import Browser
 import Content
 import Dict
-import Html exposing (Html, article, div, nav, text)
+import Html exposing (Html, article, button, div, nav, text)
 import Html.Attributes exposing (class, classList, lang)
 import Html.Events exposing (onClick)
 import Language exposing (Language(..))
@@ -131,7 +131,7 @@ languageButton model language languageName =
                 ( Nothing, Nothing ) ->
                     ( 0, 0 )
     in
-    div
+    button
         [ classList
             [ ( "language", True )
             , ( "language-" ++ languageName, True )
