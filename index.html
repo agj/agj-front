@@ -24,6 +24,26 @@
             : [],
         },
       });
+
+      const saveStateKey = "home-state";
+
+      console.log(app);
+
+      app.ports.command.subscribe(({ kind, value }) => {
+        console.log({ kind, value });
+        switch (kind) {
+          case "saveState":
+            localStorage.setItem(saveStateKey, value);
+            break;
+
+          case "requestState":
+            app.ports.notification.send({
+              kind: "saveStateLoaded",
+              value: localStorage.getItem(saveStateKey),
+            });
+            break;
+        }
+      });
     </script>
   </body>
 </html>

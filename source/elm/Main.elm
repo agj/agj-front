@@ -2,10 +2,10 @@ module Main exposing (Document, Model, init, main, subscriptions, update, view)
 
 import Browser
 import Content
-import Dict
-import Html exposing (Html, article, button, div, nav, text)
+import Html exposing (Html, article, button, nav, text)
 import Html.Attributes exposing (attribute, class, classList, disabled, lang)
 import Html.Events exposing (onClick)
+import Js
 import Language exposing (Language(..))
 import List.Extra as List
 
@@ -36,6 +36,7 @@ type alias Model =
 
 type Msg
     = SetLanguage Language
+    | JsNotification Js.Notification
 
 
 type alias Flags =
@@ -52,7 +53,7 @@ init flags =
                 |> List.head
                 |> Maybe.withDefault English
     in
-    ( Model systemLanguage systemLanguage, Cmd.none )
+    ( Model systemLanguage systemLanguage, Js.requestState )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,8 +65,16 @@ update msg model =
 
               else
                 model
+            , Js.saveState { language = newLanguage }
+            )
+
+        JsNotification (Js.SaveStateLoaded state) ->
+            ( { model | language = state.language }
             , Cmd.none
             )
+
+        JsNotification Js.Invalid ->
+            ( model, Cmd.none )
 
 
 
@@ -162,4 +171,4 @@ languageButton model language languageName =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Js.receive JsNotification
