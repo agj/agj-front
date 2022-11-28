@@ -4,7 +4,7 @@ import Browser
 import Content
 import Dict
 import Html exposing (Html, article, button, div, nav, text)
-import Html.Attributes exposing (class, classList, lang)
+import Html.Attributes exposing (attribute, class, classList, disabled, lang)
 import Html.Events exposing (onClick)
 import Language exposing (Language(..))
 import List.Extra as List
@@ -130,16 +130,27 @@ languageButton model language languageName =
 
                 ( Nothing, Nothing ) ->
                     ( 0, 0 )
+
+        selected =
+            model.language == language
     in
     button
         [ classList
             [ ( "language", True )
             , ( "language-" ++ languageName, True )
-            , ( "selected", model.language == language )
+            , ( "selected", selected )
             , ( "adjusted", position /= previousPosition )
             , ( "position-" ++ String.fromInt position, True )
             ]
         , onClick (SetLanguage language)
+        , attribute "aria-hidden"
+            (if selected then
+                "true"
+
+             else
+                "false"
+            )
+        , disabled selected
         ]
         [ text ""
         ]
