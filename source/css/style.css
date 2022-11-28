@@ -76,7 +76,7 @@ a:visited {
   content: "日本語で";
 }
 .language-selection .language.language-mandarin::after {
-  content: "中文";
+  content: "中文版";
 }
 
 .language-selection .language.selected {
