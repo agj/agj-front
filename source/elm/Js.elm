@@ -1,7 +1,7 @@
 port module Js exposing (Notification(..), requestState, saveState, subscription)
 
-import Json.Decode as D exposing (Value)
-import Json.Encode as E
+import Json.Decode as Decode exposing (Value)
+import Json.Encode as Encode
 import SaveState exposing (SaveState)
 
 
@@ -30,7 +30,7 @@ requestState =
     portToJs
         (encode
             { kind = "requestState"
-            , value = E.null
+            , value = Encode.null
             }
         )
 
@@ -41,7 +41,7 @@ requestState =
 
 type alias JsMessage =
     { kind : String
-    , value : E.Value
+    , value : Value
     }
 
 
@@ -53,28 +53,28 @@ port portFromJs : (Value -> msg) -> Sub msg
 
 parse : Value -> Notification
 parse value =
-    D.decodeValue decoder value
+    Decode.decodeValue decoder value
         |> Result.withDefault Invalid
 
 
-decoder : D.Decoder Notification
+decoder : Decode.Decoder Notification
 decoder =
-    D.field "kind" D.string
-        |> D.andThen
+    Decode.field "kind" Decode.string
+        |> Decode.andThen
             (\kind ->
                 case kind of
                     "saveStateLoaded" ->
-                        D.field "value" SaveState.decoder
-                            |> D.map SaveStateLoaded
+                        Decode.field "value" SaveState.decoder
+                            |> Decode.map SaveStateLoaded
 
                     _ ->
-                        D.fail "Kind not recognized"
+                        Decode.fail "Kind not recognized"
             )
 
 
 encode : JsMessage -> Value
 encode jsMessage =
-    E.object
-        [ ( "kind", E.string jsMessage.kind )
+    Encode.object
+        [ ( "kind", Encode.string jsMessage.kind )
         , ( "value", jsMessage.value )
         ]
