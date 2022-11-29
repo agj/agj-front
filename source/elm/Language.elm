@@ -1,7 +1,7 @@
 module Language exposing (..)
 
-import Json.Decode exposing (Decoder)
-import Json.Encode exposing (Value)
+import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Encode as Encode
 
 
 type Language
@@ -76,18 +76,18 @@ fromIsoCode isoCode =
 encode : Language -> Value
 encode language =
     toIsoCode language
-        |> Json.Encode.string
+        |> Encode.string
 
 
 decoder : Decoder Language
 decoder =
-    Json.Decode.string
-        |> Json.Decode.andThen
+    Decode.string
+        |> Decode.andThen
             (\string ->
                 case fromIsoCode string of
                     Just language ->
-                        Json.Decode.succeed language
+                        Decode.succeed language
 
                     Nothing ->
-                        Json.Decode.fail "Language not recognized"
+                        Decode.fail "Language not recognized"
             )
