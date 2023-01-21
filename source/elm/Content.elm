@@ -8,6 +8,9 @@ module Content exposing
 import Html exposing (Html, a, li, p, text, ul)
 import Html.Attributes exposing (class, href)
 import Language exposing (Language(..))
+import List.Extra as List
+import Mark
+import Mark.Error
 import Markdown
 
 
@@ -178,3 +181,65 @@ parseMarkdown md =
         |> Markdown.toHtml Nothing
         |> List.head
         |> Maybe.withDefault (p [] [])
+
+
+parseEmu : String -> List (Html msg)
+parseEmu raw =
+    let
+        withErrors : List Mark.Error.Error -> List (Html msg)
+        withErrors errors =
+            errors
+                |> List.map
+                    (Mark.Error.toString
+                        >> Html.text
+                        >> List.singleton
+                        >> Html.p []
+                    )
+    in
+    case Mark.compile emuDocument raw of
+        Mark.Success result ->
+            result
+
+        Mark.Almost { result, errors } ->
+            withErrors errors
+
+        Mark.Failure errors ->
+            withErrors errors
+
+
+emuDocument : Mark.Document (List (Html msg))
+emuDocument =
+    Mark.manyOf
+        [ Mark.map (Html.p []) inlineParser
+        ]
+        |> Mark.document identity
+
+
+inlineParser : Mark.Block (List (Html msg))
+inlineParser =
+    Mark.textWith
+        { view =
+            \styles str ->
+                let
+                    strong =
+                        if styles.bold then
+                            List.singleton >> Html.strong []
+
+                        else
+                            identity
+
+                    em =
+                        if styles.italic then
+                            List.singleton >> Html.em []
+
+                        else
+                            identity
+                in
+                strong (em (Html.text str))
+        , replacements = []
+        , inlines =
+            [ Mark.annotation "link"
+                (\url text -> Html.text text)
+                |> Mark.field "url" Mark.string
+            ]
+        }
