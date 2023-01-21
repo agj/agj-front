@@ -6,6 +6,7 @@ module Content exposing
     )
 
 import Basics.Extra as Basics
+import Dict exposing (Dict)
 import Html exposing (Html, a, li, p, text, ul)
 import Html.Attributes exposing (class, href)
 import Language exposing (Language(..))
@@ -167,17 +168,18 @@ links raw =
     parseEmu raw
 
 
-
---         ++ """
--- [piclog]: //piclog.agj.cl/
--- [mastodon]: https://mstdn.social/@agj
--- [youtube]: https://youtube.com/@agjcl
--- [vimeo]: https://www.vimeo.com/agj
--- [github]: https://github.com/agj
--- [games]: /games/
--- [greasyfork]: https://greasyfork.org/users/175009-agj
--- [tumblr]: https://alegrilli.tumblr.com/
--- """
+tagToUrl : Dict String String
+tagToUrl =
+    [ ( "piclog", "//piclog.agj.cl/" )
+    , ( "mastodon", "https://mstdn.social/@agj" )
+    , ( "youtube", "https://youtube.com/@agjcl" )
+    , ( "vimeo", "https://www.vimeo.com/agj" )
+    , ( "github", "https://github.com/agj" )
+    , ( "games", "/games/" )
+    , ( "greasyfork", "https://greasyfork.org/users/175009-agj" )
+    , ( "tumblr", "https://alegrilli.tumblr.com/" )
+    ]
+        |> Dict.fromList
 
 
 parseMarkdown md =
@@ -222,21 +224,32 @@ emuDocument =
 inlineParser : Mark.Block (List (Html msg))
 inlineParser =
     Mark.textWith
-        { view = applyStylesToInline
+        { view = renderInline
         , replacements = []
         , inlines =
-            [ Mark.annotation "link"
-                (\stylesTextPairs tag ->
-                    Html.a []
-                        (stylesTextPairs |> List.map (Basics.uncurry applyStylesToInline))
-                )
+            [ Mark.annotation "link" renderLink
                 |> Mark.field "tag" Mark.string
             ]
         }
 
 
-applyStylesToInline : Mark.Styles -> String -> Html msg
-applyStylesToInline styles text =
+renderLink : List ( Mark.Styles, String ) -> String -> Html msg
+renderLink stylesTextPairs tag =
+    let
+        urlM =
+            Dict.get tag tagToUrl
+    in
+    case urlM of
+        Just url ->
+            Html.a []
+                (stylesTextPairs |> List.map (Basics.uncurry renderInline))
+
+        Nothing ->
+            Html.text ("[UNKNOWN_LINK_TAG:" ++ tag ++ "]")
+
+
+renderInline : Mark.Styles -> String -> Html msg
+renderInline styles text =
     let
         strong =
             if styles.bold then
