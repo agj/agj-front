@@ -53,7 +53,7 @@ mandarin =
     , menu = menu "作品集" "部落格"
     , links =
         links
-            ("其外，我還有[**圖像日記**][piclog]。"
+            ("此外，我還有[**圖像日記**][piclog]。"
                 ++ "社交媒體裡面，雖然不常，我有時候會用 [Mastodon][mastodon]。"
                 ++ "我把做的**影片**放在 [Vimeo][vimeo] 或 [Youtube][youtube] 上。"
                 ++ "我一部分**程式碼**在 [Github][github] 上。"
