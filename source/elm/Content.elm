@@ -241,7 +241,7 @@ renderLink stylesTextPairs tag =
     in
     case urlM of
         Just url ->
-            Html.a []
+            Html.a [ Html.Attributes.href url ]
                 (stylesTextPairs |> List.map (Basics.uncurry renderInline))
 
         Nothing ->
