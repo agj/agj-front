@@ -2,10 +2,6 @@
   "type": "module",
   "private": true,
   "source": "./index.html",
-  "scripts": {
-    "build": "parcel build",
-    "dev": "parcel"
-  },
   "devDependencies": {
     "@parcel/transformer-elm": "^2.8.0",
     "elm": "^0.19.1-5",
