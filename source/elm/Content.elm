@@ -54,7 +54,7 @@ mandarin =
     , links =
         links
             ("其外，我還有[**圖像日記**][piclog]。"
-                ++ "社交媒體裡面，雖然不常，我會用 [Mastodon][mastodon] 或 [Twitter][twitter]。"
+                ++ "社交媒體裡面，雖然不常，我有時候會用 [Mastodon][mastodon]。"
                 ++ "我把做的**影片**放在 [Vimeo][vimeo] 或 [Youtube][youtube] 上。"
                 ++ "我一部分**程式碼**在 [Github][github] 上。"
                 ++ "在這邊你可以找到我很久以前做過的[**遊戲**][games]。"
@@ -79,7 +79,7 @@ japanese =
     , links =
         links
             ("他に、[**画像ログ**][piclog]を持っています。"
-                ++ "SNSなら[マストドン][mastodon]と[ツイッター][twitter]を滅多にしかやりません。"
+                ++ "SNSなら、[マストドン][mastodon]にたまに現れます。"
                 ++ "手掛けた**映像作品**が [Vimeo][vimeo]、[Youtube][youtube] に。"
                 ++ "書いた**コード**の一部は [Github][github] 上に。"
                 ++ "昔作った[**ゲーム**][games]が置いてあるページもあります。"
@@ -103,7 +103,7 @@ english =
     , links =
         links
             ("I also have a [**pictures log**][piclog]. "
-                ++ "Socials-wise, I barely use [Mastodon][mastodon] and [Twitter][twitter]. "
+                ++ "Socials-wise, I use [Mastodon][mastodon], although barely. "
                 ++ "My **video works** are on [Vimeo][vimeo] and [Youtube][youtube]. "
                 ++ "Some of my **code** is up on [Github][github]. "
                 ++ "I have a page with [my old **games**][games] in it. "
@@ -128,7 +128,7 @@ spanish =
     , links =
         links
             ("También tengo un [**archivo de imágenes**][piclog]. "
-                ++ "Respecto a redes sociales, apenas uso [Mastodon][mastodon] y [Twitter][twitter]. "
+                ++ "En cuanto a redes sociales, uso [Mastodon][mastodon], a veces. "
                 ++ "Mis **videos** están en [Vimeo][vimeo] y [Youtube][youtube]. "
                 ++ "Parte de mi **código** está en [Github][github]. "
                 ++ "Una página alberga [mis **videojuegos** viejos][games]. "
@@ -163,7 +163,6 @@ links md =
 
 [piclog]: //piclog.agj.cl/
 [mastodon]: https://mstdn.social/@agj
-[twitter]: https://twitter.com/alegrilli
 [youtube]: https://youtube.com/@agjcl
 [vimeo]: https://www.vimeo.com/agj
 [github]: https://github.com/agj
