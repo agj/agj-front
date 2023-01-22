@@ -13,7 +13,6 @@ import Language exposing (Language(..))
 import List.Extra as List
 import Mark
 import Mark.Error
-import Markdown
 
 
 type alias Content msg =
