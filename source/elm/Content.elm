@@ -188,13 +188,6 @@ links raw =
     parseEmu raw
 
 
-parseMarkdown md =
-    md
-        |> Markdown.toHtml Nothing
-        |> List.head
-        |> Maybe.withDefault (p [] [])
-
-
 parseEmu : String -> List (Html msg)
 parseEmu raw =
     let
