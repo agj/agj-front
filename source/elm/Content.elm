@@ -147,6 +147,26 @@ spanish =
 -- INTERNAL
 
 
+linkUrlsByTag : Dict String String
+linkUrlsByTag =
+    [ ( "piclog", "//piclog.agj.cl/" )
+    , ( "mastodon", "https://mstdn.social/@agj" )
+    , ( "youtube", "https://youtube.com/@agjcl" )
+    , ( "vimeo", "https://www.vimeo.com/agj" )
+    , ( "github", "https://github.com/agj" )
+    , ( "games", "/games/" )
+    , ( "greasyfork", "https://greasyfork.org/users/175009-agj" )
+    , ( "tumblr", "https://alegrilli.tumblr.com/" )
+    ]
+        |> Dict.fromList
+
+
+linkAttributesByTag : Dict String (List (Html.Attribute msg))
+linkAttributesByTag =
+    [ ( "mastodon", [ Html.Attributes.rel "me" ] ) ]
+        |> Dict.fromList
+
+
 intro : String -> List (Html msg)
 intro raw =
     parseEmu raw
@@ -166,20 +186,6 @@ menu portfolioLabel blogLabel =
 links : String -> List (Html msg)
 links raw =
     parseEmu raw
-
-
-tagToUrl : Dict String String
-tagToUrl =
-    [ ( "piclog", "//piclog.agj.cl/" )
-    , ( "mastodon", "https://mstdn.social/@agj" )
-    , ( "youtube", "https://youtube.com/@agjcl" )
-    , ( "vimeo", "https://www.vimeo.com/agj" )
-    , ( "github", "https://github.com/agj" )
-    , ( "games", "/games/" )
-    , ( "greasyfork", "https://greasyfork.org/users/175009-agj" )
-    , ( "tumblr", "https://alegrilli.tumblr.com/" )
-    ]
-        |> Dict.fromList
 
 
 parseMarkdown md =
@@ -237,11 +243,15 @@ renderLink : List ( Mark.Styles, String ) -> String -> Html msg
 renderLink stylesTextPairs tag =
     let
         urlM =
-            Dict.get tag tagToUrl
+            Dict.get tag linkUrlsByTag
+
+        attributes =
+            Dict.get tag linkAttributesByTag
+                |> Maybe.withDefault []
     in
     case urlM of
         Just url ->
-            Html.a [ Html.Attributes.href url ]
+            Html.a (Html.Attributes.href url :: attributes)
                 (stylesTextPairs |> List.map (Basics.uncurry renderInline))
 
         Nothing ->
