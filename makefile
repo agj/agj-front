@@ -3,6 +3,7 @@ dev: install ## Run development server.
 	npx parcel
 
 build: install ## Build for release.
+	rm -rf dist
 	npx parcel build
 
 install: ## Only install dependencies.
