@@ -92,6 +92,15 @@ view model =
     let
         content =
             Content.fromLanguage model.language
+
+        navElement =
+            nav [ class "language-selection" ]
+                (Language.all
+                    |> List.map
+                        (\language ->
+                            languageButton model language (Language.toName language)
+                        )
+                )
     in
     { title = content.title
     , body =
@@ -99,15 +108,8 @@ view model =
             [ class "container"
             , lang (Language.toIsoCode model.language)
             ]
-            ([ nav [ class "language-selection" ]
-                (Language.all
-                    |> List.map
-                        (\language ->
-                            languageButton model language (Language.toName language)
-                        )
-                )
-             ]
-                ++ content.intro
+            (navElement
+                :: content.intro
                 ++ [ content.menu ]
                 ++ content.links
             )
