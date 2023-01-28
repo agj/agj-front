@@ -5,9 +5,9 @@ import Content
 import Html exposing (Html, article, button, nav, text)
 import Html.Attributes exposing (attribute, class, classList, disabled, lang)
 import Html.Events exposing (onClick)
-import Js
 import Language exposing (Language(..))
 import List.Extra as List
+import Ports
 
 
 
@@ -36,7 +36,7 @@ type alias Model =
 
 type Msg
     = SetLanguage Language
-    | JsNotification Js.Notification
+    | JsNotification Ports.Msg
 
 
 type alias Flags =
@@ -53,7 +53,7 @@ init flags =
                 |> List.head
                 |> Maybe.withDefault English
     in
-    ( Model systemLanguage systemLanguage, Js.requestState )
+    ( Model systemLanguage systemLanguage, Ports.requestState )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,15 +65,15 @@ update msg model =
 
               else
                 model
-            , Js.saveState { language = newLanguage }
+            , Ports.saveState { language = newLanguage }
             )
 
-        JsNotification (Js.SaveStateLoaded state) ->
+        JsNotification (Ports.SaveStateLoaded state) ->
             ( { model | language = state.language }
             , Cmd.none
             )
 
-        JsNotification Js.Invalid ->
+        JsNotification (Ports.Invalid _) ->
             ( model, Cmd.none )
 
 
@@ -174,4 +174,4 @@ languageButton model language languageName =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Js.subscription JsNotification
+    Ports.subscription JsNotification
