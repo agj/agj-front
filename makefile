@@ -1,5 +1,9 @@
 
-dev: install ## Run development server.
+init: ## Start a development shell, if you don't use direnv.
+	@echo "Use 'exit' to return to the regular shell."
+	nix develop -c $$SHELL
+
+dev: install ## Run the development server.
 	npx parcel
 
 build: install ## Build for release.
@@ -15,6 +19,6 @@ install: ## Only install dependencies.
 # See: https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 .DEFAULT_GOAL := help
