@@ -23,6 +23,7 @@
             elmPackages.elm-test
             nodejs-slim_20
             nodePackages.pnpm
+            nodePackages.prettier
           ];
         };
       }
