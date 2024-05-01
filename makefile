@@ -10,6 +10,9 @@ build: install ## Build for release.
 	rm -rf dist
 	npx parcel build
 
+deploy: build ## Build and deploy.
+	nu ./scripts/deploy.nu
+
 install: ## Only install dependencies.
 	pnpm install
 
