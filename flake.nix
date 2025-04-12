@@ -16,15 +16,16 @@
         pkgs = import nixpkgs {system = system;};
       in {
         devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            elmPackages.elm
-            elmPackages.elm-format
-            elmPackages.elm-json
-            elmPackages.elm-test
-            nodejs-slim_20
-            nodePackages.pnpm
-            nodePackages.prettier
-            nushell
+          buildInputs = [
+            pkgs.elmPackages.elm
+            pkgs.elmPackages.elm-format
+            pkgs.elmPackages.elm-json
+            pkgs.elmPackages.elm-test
+            pkgs.just
+            pkgs.nodePackages.pnpm
+            pkgs.nodePackages.prettier
+            pkgs.nodejs-slim_20
+            pkgs.nushell
           ];
         };
       }
