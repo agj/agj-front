@@ -4,6 +4,7 @@ dist/
 elm-stuff/
 node_modules/
 .vscode/
+.helix/
 .parcel-cache/
 .elm-stuff/
 .direnv
