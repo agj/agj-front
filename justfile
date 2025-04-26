@@ -1,6 +1,6 @@
 [private]
-default:
-    just --list
+@default:
+    just --list --unsorted
 
 # Start a development shell, if you don't use direnv.
 init:
@@ -9,12 +9,12 @@ init:
 
 # Run the development server.
 dev: install
-  npx parcel
+  pnpm exec parcel
 
 # Build for release.
 build: install
   rm -rf dist
-  npx parcel build
+  pnpm exec parcel build
 
 # Build and deploy.
 deploy: build
