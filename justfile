@@ -20,6 +20,6 @@ build: install
 deploy: build
   nu ./scripts/deploy.nu
 
-# Only install dependencies.
+[private]
 install:
   pnpm install
