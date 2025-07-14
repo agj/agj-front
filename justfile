@@ -18,7 +18,7 @@ build: install
 
 # Build and deploy.
 deploy: build
-  nu ./scripts/deploy.nu
+  nu ./tasks/deploy.nu
 
 [private]
 install:
