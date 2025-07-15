@@ -2,7 +2,10 @@
   description = "agj.cl front";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Temporary, to get elm-format fixed early.
+    # https://nixpk.gs/pr-tracker.html?pr=419302
+    nixpkgs.url = "github:nixos/nixpkgs/master";
+    # nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
