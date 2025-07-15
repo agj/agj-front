@@ -1,6 +1,6 @@
 [private]
 @default:
-    just --list --unsorted
+  just --list --unsorted
 
 # Start a development shell, if you don't use direnv.
 init:
@@ -15,6 +15,10 @@ dev: install
 build: install
   rm -rf dist
   pnpm exec parcel build
+
+# Update files that block AI crawlers.
+update-ai-block:
+  nu ./tasks/update-ai-block.nu
 
 # Build and deploy.
 deploy: build
