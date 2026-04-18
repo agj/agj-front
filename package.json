@@ -1,19 +1,8 @@
 {
   "type": "module",
   "private": true,
-  "source": "./index.html",
   "devDependencies": {
-    "@parcel/config-default": "2.12.0",
-    "@parcel/core": "2.12.0",
-    "@parcel/transformer-elm": "2.12.0",
-    "parcel": "2.12.0",
-    "parcel-resolver-ignore": "2.2.0"
-  },
-  "parcelIgnore": [
-    "/icon.gif",
-    "/fonts/.*"
-  ],
-  "engines": {
-    "npm": "Please use pnpm"
+    "vite": "^8.0.8",
+    "vite-plugin-gleam": "^0.1.8"
   }
 }

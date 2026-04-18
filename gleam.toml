@@ -24,15 +24,6 @@ lustre_dev_tools = ">= 2.3.6 and < 3.0.0"
 # Lustre configuration.
 # See: https://hexdocs.pm/lustre_dev_tools/toml-reference.html
 
-[tools.lustre.html]
-stylesheets = [
-  # { href = "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css" },
-]
-
 [tools.lustre.build]
 minify = true
 outdir = "./dist"
-
-[tools.lustre.bin]
-bun = "system"
-tailwindcss = "system"
