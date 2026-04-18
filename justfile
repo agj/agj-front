@@ -2,24 +2,14 @@
 @default:
     just --list --unsorted
 
-# Start a development shell, if you don't use direnv.
-init:
-  @echo "Use 'exit' to return to the regular shell."
-  nix develop -c "$$SHELL"
-
 # Run the development server.
-dev: install
-  pnpm exec parcel
+dev:
+  gleam run -m lustre/dev start
 
 # Build for release.
-build: install
-  rm -rf dist
-  pnpm exec parcel build
+build:
+  gleam run -m lustre/dev build --minify
 
 # Build and deploy.
 deploy: build
   nu ./tasks/deploy.nu
-
-[private]
-install:
-  pnpm install
