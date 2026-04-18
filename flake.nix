@@ -1,9 +1,8 @@
 {
-  description = "agj.cl front";
-
   inputs = {
-    # Temporary, to get elm-format fixed early.
-    # https://nixpk.gs/pr-tracker.html?pr=419302
+    # Temporarily on master due to Nushell issue.
+    # See: https://github.com/NixOS/nixpkgs/issues/510488
+    # See: https://nixpk.gs/pr-tracker.html?pr=510439
     nixpkgs.url = "github:nixos/nixpkgs/master";
     # nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -25,10 +24,10 @@
             pkgs.elmPackages.elm-json
             pkgs.elmPackages.elm-test
             pkgs.just
-            pkgs.nodePackages.pnpm
-            pkgs.nodePackages.prettier
-            pkgs.nodejs-slim_20
+            pkgs.nodejs-slim_24
             pkgs.nushell
+            pkgs.pnpm
+            pkgs.prettier
           ];
         };
       }
