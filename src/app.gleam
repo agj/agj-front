@@ -1,3 +1,4 @@
+import css_svg
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
@@ -32,6 +33,8 @@ fn view(_: Model) -> Element(Nil) {
         #("width", "20rem"),
         #("height", "20rem"),
         #("background-color", "pink"),
+        #("background-image", css_svg.pattern_triangles("cyan")),
+        #("background-size", "1rem"),
       ]),
     ],
     [html.text("hi")],
