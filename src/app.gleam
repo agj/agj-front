@@ -34,58 +34,50 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
 // VIEW
 
 fn view(_: Model) -> Element(Msg) {
-  html.div(
-    [
-      attribute.styles([
-        #("width", rem(20)),
-        #("height", rem(20)),
-        #("background-color", "var(--background-color)"),
-      ]),
-    ],
-    [
-      html.div([], [
-        html.p([], [html.text("I'm Ale, otherwise known as agj. My things:")]),
-        html.ul([], [
-          item([
-            link("blog", to: "https://blog.agj.cl/"),
-          ]),
-          item([
-            link("portfolio", to: "https://agj.cl/portfolio/"),
-          ]),
+  html.div([], [
+    html.style([], global_css()),
+    block(w: 15, h: 13, left: -10, top: -5, content: [
+      html.p([], [html.text("I'm Ale, otherwise known as agj. My things:")]),
+      html.ul([], [
+        item([
+          link("blog", to: "https://blog.agj.cl/"),
         ]),
-        html.p([], [html.text("Un- or less-maintained:")]),
-        html.ul([], [
-          item([
-            link("pictures", to: "https://piclog.agj.cl/"),
-          ]),
-          item([
-            link("games", to: "https://agj.cl/games/"),
-          ]),
+        item([
+          link("portfolio", to: "https://agj.cl/portfolio/"),
         ]),
       ]),
-      html.div([], [
-        html.p([], [html.text("Elsewhere:")]),
-        html.ul([], [
-          item([
-            icon.envelope() |> icon.view(),
-            html.text(" "),
-            html.text("ale☯️agj.cl"),
-          ]),
-          item([
-            icon.mastodon() |> icon.view(),
-            html.text(" "),
-            link_ext("Mastodon", to: "https://mstdn.social/@agj"),
-          ]),
-          item([
-            icon.github() |> icon.view(),
-            html.text(" "),
-            link_ext("Github", to: "https://github.com/agj"),
-          ]),
+      html.p([], [html.text("Un- or less-maintained:")]),
+      html.ul([], [
+        item([
+          link("pictures", to: "https://piclog.agj.cl/"),
+        ]),
+        item([
+          link("games", to: "https://agj.cl/games/"),
         ]),
       ]),
-      html.style([], global_css()),
-    ],
-  )
+    ]),
+    block(w: 12, h: 10, left: 0, top: 5, content: [
+      html.p([], [html.text("Elsewhere:")]),
+      html.ul([], [
+        item([
+          icon.envelope() |> icon.view(),
+          html.text(" ale"),
+          icon.at_sign() |> icon.view(),
+          html.text("agj.cl"),
+        ]),
+        item([
+          icon.mastodon() |> icon.view(),
+          html.text(" "),
+          link_ext("Mastodon", to: "https://mstdn.social/@agj"),
+        ]),
+        item([
+          icon.github() |> icon.view(),
+          html.text(" "),
+          link_ext("Github", to: "https://github.com/agj"),
+        ]),
+      ]),
+    ]),
+  ])
 }
 
 fn global_css() -> String {
@@ -105,7 +97,28 @@ const foreground_color = "#4b4f59"
 
 const background_color = "#f3cbe5"
 
-// UTILITIES
+// HTML UTILITIES
+
+fn block(
+  content content: List(Element(Msg)),
+  w w: Int,
+  h h: Int,
+  left left: Int,
+  top top: Int,
+) -> Element(Msg) {
+  html.div(
+    [
+      attribute.class("block"),
+      attribute.styles([
+        #("width", rem(w)),
+        #("height", rem(h)),
+        #("left", "calc(50vw + " <> { int.to_string(left) } <> "rem)"),
+        #("top", "calc(50vh + " <> { int.to_string(top) } <> "rem)"),
+      ]),
+    ],
+    content,
+  )
+}
 
 fn item(content: List(Element(Msg))) -> Element(Msg) {
   html.li([], [icon.arrow_right() |> icon.view(), html.text(" "), ..content])
