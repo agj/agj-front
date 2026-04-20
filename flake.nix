@@ -21,18 +21,12 @@
           buildInputs = [
             pkgs.beam28Packages.erlang
             pkgs.beam28Packages.rebar3
-            pkgs.bun
-            pkgs.elmPackages.elm
-            pkgs.elmPackages.elm-format
-            pkgs.elmPackages.elm-json
-            pkgs.elmPackages.elm-test
             pkgs.gleam
             pkgs.just
             pkgs.nodejs-slim_24
             pkgs.nushell
             pkgs.pnpm
             pkgs.prettier
-            pkgs.tailwindcss_4
           ];
         };
       }

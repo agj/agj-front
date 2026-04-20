@@ -1,17 +1,15 @@
-dist/
+/dist/
 .env
 
-*.beam
-*.ez
-/build
-erl_crash.dump
-/.lustre
-/dist
-
-elm-stuff/
-node_modules/
+# Editors
 .vscode/
 .helix/
-.parcel-cache/
-.elm-stuff/
-.direnv
+
+# Tools
+/build/
+*.beam
+*.ez
+erl_crash.dump
+/.lustre/
+node_modules/
+.direnv/
