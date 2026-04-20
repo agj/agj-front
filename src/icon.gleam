@@ -14,12 +14,7 @@ fn to_icon(icon_fn: PhosphorIcon) -> Icon {
 }
 
 pub fn view(icon: Icon) {
-  icon.function([
-    attribute.styles([
-      #("display", "inline"),
-      #("baseline-shift", "-0.23em"),
-    ]),
-  ])
+  icon.function([attribute.class("icon")])
 }
 
 pub fn envelope() {

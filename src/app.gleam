@@ -90,20 +90,8 @@ fn view(_: Model) -> Element(Msg) {
 
 fn global_css() -> String {
   [
-    #(":root", [
-      #("padding", "0"),
-      #("height", pct(100)),
-      #("font-size", px(19)),
-    ]),
     #("body", [
-      #("display", "flex"),
-      #("height", pct(100)),
-      #("justify-content", "center"),
-      #("align-items", "center"),
-      #("margin", "0"),
       #("background-image", css_svg.pattern_triangles("cyan")),
-      #("background-size", rem(1)),
-      #("background-position", "top calc(50vh - 10rem) left calc(50vw - 10rem)"),
     ]),
   ]
   |> css_to_string
