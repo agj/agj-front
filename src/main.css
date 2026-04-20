@@ -2,6 +2,8 @@
   padding: 0;
   height: 100%;
   font-size: 19px;
+  color: var(--foreground-color);
+  background-color: var(--background-color);
 }
 
 body {
@@ -10,6 +12,7 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
+  background-image: var(--background-image);
   background-size: 1rem;
   background-position: top calc(50vh - 10rem) left calc(50vw - 10rem);
 }

@@ -39,7 +39,7 @@ fn view(_: Model) -> Element(Msg) {
       attribute.styles([
         #("width", rem(20)),
         #("height", rem(20)),
-        #("background-color", "pink"),
+        #("background-color", "var(--background-color)"),
       ]),
     ],
     [
@@ -90,12 +90,20 @@ fn view(_: Model) -> Element(Msg) {
 
 fn global_css() -> String {
   [
-    #("body", [
-      #("background-image", css_svg.pattern_triangles("cyan")),
+    #(":root", [
+      #("--foreground-color", foreground_color),
+      #("--background-color", background_color),
+      #("--background-image", css_svg.pattern_triangles(foreground_color)),
     ]),
   ]
   |> css_to_string
 }
+
+// CONSTANTS
+
+const foreground_color = "#4b4f59"
+
+const background_color = "#f3cbe5"
 
 // UTILITIES
 
