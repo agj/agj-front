@@ -1,4 +1,5 @@
 import css_svg
+import gleam/int
 import gleam/list
 import gleam/string
 import lustre
@@ -28,17 +29,52 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
   #(Nil, effect.none())
 }
 
-fn view(_: Model) -> Element(Nil) {
+// VIEW
+
+fn view(_: Model) -> Element(Msg) {
   html.div(
     [
       attribute.styles([
-        #("width", "20rem"),
-        #("height", "20rem"),
+        #("width", rem(20)),
+        #("height", rem(20)),
         #("background-color", "pink"),
       ]),
     ],
     [
-      html.text("hi"),
+      html.div([], [
+        html.p([], [html.text("I'm Ale, otherwise known as agj. My things:")]),
+        html.ul([], [
+          html.li([], [
+            link("blog", to: "https://blog.agj.cl/"),
+          ]),
+          html.li([], [
+            link("portfolio", to: "https://agj.cl/portfolio/"),
+          ]),
+        ]),
+        html.p([], [html.text("Un- or less-maintained:")]),
+        html.ul([], [
+          html.li([], [
+            link("pictures", to: "https://piclog.agj.cl/"),
+          ]),
+          html.li([], [
+            link("games", to: "https://agj.cl/games/"),
+          ]),
+        ]),
+      ]),
+      html.div([], [
+        html.p([], [html.text("Elsewhere:")]),
+        html.ul([], [
+          html.li([], [
+            html.text("ale☯️agj.cl"),
+          ]),
+          html.li([], [
+            link_ext("Mastodon", to: "https://mstdn.social/@agj"),
+          ]),
+          html.li([], [
+            link_ext("Github", to: "https://github.com/agj"),
+          ]),
+        ]),
+      ]),
       html.style([], global_css()),
     ],
   )
@@ -46,20 +82,36 @@ fn view(_: Model) -> Element(Nil) {
 
 fn global_css() -> String {
   [
-    #(":root", [#("padding", "0"), #("height", "100%")]),
+    #(":root", [
+      #("padding", "0"),
+      #("height", pct(100)),
+      #("font-size", px(19)),
+    ]),
     #("body", [
       #("display", "flex"),
-      #("height", "100%"),
+      #("height", pct(100)),
       #("justify-content", "center"),
       #("align-items", "center"),
       #("margin", "0"),
       #("background-image", css_svg.pattern_triangles("cyan")),
-      #("background-size", "1rem"),
+      #("background-size", rem(1)),
       #("background-position", "top calc(50vh - 10rem) left calc(50vw - 10rem)"),
     ]),
   ]
   |> css_to_string
 }
+
+// UTILITIES
+
+fn link(label: String, to url: String) -> Element(Msg) {
+  html.a([attribute.href(url)], [html.text(label)])
+}
+
+fn link_ext(label: String, to url: String) -> Element(Msg) {
+  html.a([attribute.href(url), attribute.target("_blank")], [html.text(label)])
+}
+
+// CSS UTILITIES
 
 fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
   css
@@ -75,4 +127,16 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
     { selector <> " { " <> styles_string <> " }" }
   })
   |> string.join("\n")
+}
+
+fn rem(n: Int) -> String {
+  { int.to_string(n) } <> "rem"
+}
+
+fn px(n: Int) -> String {
+  { int.to_string(n) } <> "px"
+}
+
+fn pct(n: Int) -> String {
+  { int.to_string(n) } <> "%"
 }
