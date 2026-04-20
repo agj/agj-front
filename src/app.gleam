@@ -8,7 +8,6 @@ import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
-import phosphor
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -86,6 +85,7 @@ fn global_css() -> String {
       #("--background-color", background_color),
       #("--background-image", css_svg.pattern_triangles(foreground_color)),
       #("--foreground-color", foreground_color),
+      #("--tertiary-color", tertiary_color),
     ]),
   ]
   |> css_to_string
@@ -96,6 +96,8 @@ fn global_css() -> String {
 const foreground_color = "#4b4f59"
 
 const background_color = "#f3cbe5"
+
+const tertiary_color = "white"
 
 // HTML UTILITIES
 

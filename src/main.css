@@ -17,6 +17,15 @@ body {
   margin: 0;
 }
 
+a {
+  color: var(--foreground-color);
+  text-decoration-color: var(--tertiary-color);
+  text-decoration-inset: 0.05em;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: 0.2em;
+  text-underline-offset: 0em;
+}
+
 .block {
   background-color: var(--background-color);
   display: flex;
