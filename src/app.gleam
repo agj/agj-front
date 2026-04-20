@@ -91,9 +91,9 @@ fn view(_: Model) -> Element(Msg) {
 fn global_css() -> String {
   [
     #(":root", [
-      #("--foreground-color", foreground_color),
       #("--background-color", background_color),
       #("--background-image", css_svg.pattern_triangles(foreground_color)),
+      #("--foreground-color", foreground_color),
     ]),
   ]
   |> css_to_string

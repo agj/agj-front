@@ -1,23 +1,23 @@
 :root {
-  padding: 0;
-  height: 100%;
-  font-size: 19px;
-  color: var(--foreground-color);
   background-color: var(--background-color);
+  color: var(--foreground-color);
+  font-size: 19px;
+  height: 100%;
+  padding: 0;
 }
 
 body {
+  align-items: center;
+  background-image: var(--background-image);
+  background-position: top calc(50vh - 10rem) left calc(50vw - 10rem);
+  background-size: 1rem;
   display: flex;
   height: 100%;
   justify-content: center;
-  align-items: center;
   margin: 0;
-  background-image: var(--background-image);
-  background-size: 1rem;
-  background-position: top calc(50vh - 10rem) left calc(50vw - 10rem);
 }
 
 .icon {
-  display: inline;
   baseline-shift: -0.23em;
+  display: inline;
 }
