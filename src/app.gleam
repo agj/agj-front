@@ -110,10 +110,10 @@ fn block(
     [
       attribute.class("block"),
       attribute.styles([
-        #("width", rem(w)),
-        #("height", rem(h)),
         #("left", "calc(50vw + " <> { int.to_string(left) } <> "rem)"),
+        #("min-height", rem(h)),
         #("top", "calc(50vh + " <> { int.to_string(top) } <> "rem)"),
+        #("width", rem(w)),
       ]),
     ],
     content,
