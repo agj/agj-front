@@ -2,11 +2,13 @@ import css_svg
 import gleam/int
 import gleam/list
 import gleam/string
+import icon
 import lustre
 import lustre/attribute
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
+import phosphor
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -65,12 +67,18 @@ fn view(_: Model) -> Element(Msg) {
         html.p([], [html.text("Elsewhere:")]),
         html.ul([], [
           html.li([], [
+            icon.envelope() |> icon.view(),
+            html.text(" "),
             html.text("ale☯️agj.cl"),
           ]),
           html.li([], [
+            icon.mastodon() |> icon.view(),
+            html.text(" "),
             link_ext("Mastodon", to: "https://mstdn.social/@agj"),
           ]),
           html.li([], [
+            icon.github() |> icon.view(),
+            html.text(" "),
             link_ext("Github", to: "https://github.com/agj"),
           ]),
         ]),
