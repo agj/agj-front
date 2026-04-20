@@ -35,8 +35,12 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
 fn view(_: Model) -> Element(Msg) {
   html.div([], [
     html.style([], global_css()),
-    block(w: 15, h: 13, left: -10, top: -5, content: [
-      html.p([], [html.text("I'm Ale, otherwise known as agj. My things:")]),
+    block(w: 17, h: 16, left: -10, top: -10, content: [
+      html.p([], [
+        html.text("I'm Ale, otherwise known as "),
+        html.b([], [html.text("agj")]),
+        html.text(". My things:"),
+      ]),
       html.ul([], [
         item([
           link("blog", to: "https://blog.agj.cl/"),
@@ -45,7 +49,7 @@ fn view(_: Model) -> Element(Msg) {
           link("portfolio", to: "https://agj.cl/portfolio/"),
         ]),
       ]),
-      html.p([], [html.text("Un- or less-maintained:")]),
+      html.p([], [html.text("Less maintained but still here:")]),
       html.ul([], [
         item([
           link("pictures", to: "https://piclog.agj.cl/"),
@@ -108,7 +112,7 @@ fn block(
   left left: Int,
   top top: Int,
 ) -> Element(Msg) {
-  html.div(
+  html.section(
     [
       attribute.class("block"),
       attribute.styles([
@@ -118,7 +122,7 @@ fn block(
         #("width", rem(w)),
       ]),
     ],
-    content,
+    [html.div([], content)],
   )
 }
 
