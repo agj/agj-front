@@ -17,6 +17,18 @@ body {
   margin: 0;
 }
 
+/* LISTS */
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+/* MORE */
+
 .icon {
   baseline-shift: -0.23em;
   display: inline;

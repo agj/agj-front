@@ -46,19 +46,19 @@ fn view(_: Model) -> Element(Msg) {
       html.div([], [
         html.p([], [html.text("I'm Ale, otherwise known as agj. My things:")]),
         html.ul([], [
-          html.li([], [
+          item([
             link("blog", to: "https://blog.agj.cl/"),
           ]),
-          html.li([], [
+          item([
             link("portfolio", to: "https://agj.cl/portfolio/"),
           ]),
         ]),
         html.p([], [html.text("Un- or less-maintained:")]),
         html.ul([], [
-          html.li([], [
+          item([
             link("pictures", to: "https://piclog.agj.cl/"),
           ]),
-          html.li([], [
+          item([
             link("games", to: "https://agj.cl/games/"),
           ]),
         ]),
@@ -66,17 +66,17 @@ fn view(_: Model) -> Element(Msg) {
       html.div([], [
         html.p([], [html.text("Elsewhere:")]),
         html.ul([], [
-          html.li([], [
+          item([
             icon.envelope() |> icon.view(),
             html.text(" "),
             html.text("ale☯️agj.cl"),
           ]),
-          html.li([], [
+          item([
             icon.mastodon() |> icon.view(),
             html.text(" "),
             link_ext("Mastodon", to: "https://mstdn.social/@agj"),
           ]),
-          html.li([], [
+          item([
             icon.github() |> icon.view(),
             html.text(" "),
             link_ext("Github", to: "https://github.com/agj"),
@@ -106,6 +106,10 @@ const foreground_color = "#4b4f59"
 const background_color = "#f3cbe5"
 
 // UTILITIES
+
+fn item(content: List(Element(Msg))) -> Element(Msg) {
+  html.li([], [icon.arrow_right() |> icon.view(), html.text(" "), ..content])
+}
 
 fn link(label: String, to url: String) -> Element(Msg) {
   html.a([attribute.href(url)], [html.text(label)])

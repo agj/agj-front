@@ -13,18 +13,28 @@ fn to_icon(icon_fn: PhosphorIcon) -> Icon {
   Icon(function: icon_fn)
 }
 
-pub fn view(icon: Icon) {
+pub fn view(icon: Icon) -> Element(Nil) {
   icon.function([attribute.class("icon")])
 }
 
-pub fn envelope() {
+// ICONS
+
+pub fn envelope() -> Icon {
   phosphor.envelope_regular |> to_icon
 }
 
-pub fn mastodon() {
+pub fn at_sign() -> Icon {
+  phosphor.at_regular |> to_icon
+}
+
+pub fn mastodon() -> Icon {
   phosphor.mastodon_logo_fill |> to_icon
 }
 
-pub fn github() {
+pub fn github() -> Icon {
   phosphor.github_logo_fill |> to_icon
+}
+
+pub fn arrow_right() -> Icon {
+  phosphor.arrow_right_regular |> to_icon
 }
