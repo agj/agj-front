@@ -21,21 +21,37 @@ pub fn main() -> Nil {
 }
 
 type Msg {
+  LanguageSelectionRequested(Bool)
   LanguageSelected(Language)
 }
 
 type Model {
-  Model(language: Language, texts: Texts(Msg))
+  Model(language: Language, language_selection_open: Bool, texts: Texts(Msg))
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model(language: English, texts: texts.for_language(English)), effect.none())
+  #(
+    Model(
+      language: English,
+      language_selection_open: False,
+      texts: texts.for_language(English),
+    ),
+    effect.none(),
+  )
 }
 
-fn update(_model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
+    LanguageSelectionRequested(open) -> #(
+      Model(..model, language_selection_open: open),
+      effect.none(),
+    )
     LanguageSelected(language) -> #(
-      Model(language:, texts: texts.for_language(language)),
+      Model(
+        language:,
+        texts: texts.for_language(language),
+        language_selection_open: False,
+      ),
       effect.none(),
     )
   }
@@ -46,6 +62,8 @@ fn update(_model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 fn view(model: Model) -> Element(Msg) {
   html.div([attribute.class("container")], [
     html.style([], global_css()),
+
+    // "Introduction" block.
     block(
       anchor: TopLeft,
       x: 0,
@@ -67,6 +85,8 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ],
     ),
+
+    // "Less maintained" block.
     block(
       anchor: TopRight,
       x: 4,
@@ -86,6 +106,8 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ],
     ),
+
+    // "Elsewhere" block.
     block(
       anchor: BottomRight,
       x: 0,
@@ -115,37 +137,85 @@ fn view(model: Model) -> Element(Msg) {
         ]),
       ],
     ),
+
+    // Language change button.
+    block(
+      anchor: BottomLeft,
+      x: 2,
+      y: 2,
+      width: 3,
+      height: 3,
+      attrs: [
+        attribute.class("language-change"),
+        // attribute.styles([
+      //   #("padding", "0"),
+      //   #("width", rem(3)),
+      //   #("height", rem(3)),
+      // ]),
+      ],
+      content: [
+        html.button(
+          [
+            event.on_click(LanguageSelectionRequested(True)),
+            // attribute.styles([
+          //   #("font-size", rem_(1.5)),
+          //   #("padding", "0"),
+          //   #("flex-grow", "1"),
+          //   #("width", "100%"),
+          //   #("height", "100%"),
+          // ]),
+          ],
+          [
+            icon.globe() |> icon.view() |> element.map(never),
+          ],
+        ),
+      ],
+    ),
+
+    // Language selection menu.
     block(
       anchor: BottomLeft,
       x: 5,
       y: 2,
-      width: 7,
-      height: 11,
-      attrs: [attribute.styles([#("align-items", "center")])],
-      content: list.flatten([
-        [
-          html.span([attribute.styles([#("font-size", rem_(1.5))])], [
-            icon.globe() |> icon.view() |> element.map(never),
-          ]),
-        ],
-        case model.language == English {
-          False -> [msg_button("English", msg: LanguageSelected(English))]
-          True -> []
+      width: 9,
+      height: 12,
+      attrs: [
+        case model.language_selection_open {
+          True -> attribute.none()
+          False -> attribute.class("hidden")
         },
-        case model.language == Spanish {
-          False -> [msg_button("Español", msg: LanguageSelected(Spanish))]
-          True -> []
-        },
-        case model.language == Japanese {
-          False -> [msg_button("日本語", msg: LanguageSelected(Japanese))]
-          True -> []
-        },
-        case model.language == Mandarin {
-          False -> [msg_button("中文", msg: LanguageSelected(Mandarin))]
-          True -> []
-        },
-      ]),
+        // attribute.styles([#("align-items", "center")]),
+      ],
+      content: [
+        view_language_button(
+          "English",
+          current: model.language,
+          target: English,
+        ),
+        view_language_button(
+          "Español",
+          current: model.language,
+          target: Spanish,
+        ),
+        view_language_button("日本語", current: model.language, target: Japanese),
+        view_language_button("中文", current: model.language, target: Mandarin),
+      ],
     ),
+  ])
+}
+
+fn view_language_button(
+  label: String,
+  current current: Language,
+  target target: Language,
+) -> Element(Msg) {
+  let check_icon = case target == current {
+    True -> icon.check()
+    False -> icon.empty()
+  }
+  html.button([event.on_click(LanguageSelected(target))], [
+    check_icon |> icon.view() |> element.map(never),
+    html.text(" " <> label),
   ])
 }
 
@@ -223,8 +293,8 @@ fn link_ext(label: String, to url: String) -> Element(Msg) {
   html.a([attribute.href(url), attribute.target("_blank")], [html.text(label)])
 }
 
-fn msg_button(label: String, msg msg: Msg) -> Element(Msg) {
-  html.button([event.on_click(msg)], [html.text(label)])
+fn msg_button(content: List(Element(Msg)), msg msg: Msg) -> Element(Msg) {
+  html.button([event.on_click(msg)], content)
 }
 
 // CSS UTILITIES

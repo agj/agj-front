@@ -21,6 +21,22 @@ pub fn view(icon: Icon) -> Element(Never) {
 
 // ICONS
 
+pub fn empty() -> Icon {
+  fn(attrs) {
+    html.div(
+      [
+        attribute.styles([
+          #("width", "1em"),
+          #("height", "1em"),
+        ]),
+        ..attrs
+      ],
+      [],
+    )
+  }
+  |> to_icon
+}
+
 pub fn envelope() -> Icon {
   phosphor.envelope_regular |> to_icon
 }
@@ -43,4 +59,8 @@ pub fn arrow_right() -> Icon {
 
 pub fn globe() -> Icon {
   phosphor.globe_regular |> to_icon
+}
+
+pub fn check() -> Icon {
+  phosphor.check_regular |> to_icon
 }
