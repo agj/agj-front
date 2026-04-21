@@ -19,6 +19,7 @@ pub type Language {
   English
   Spanish
   Japanese
+  Mandarin
 }
 
 pub fn for_language(language: Language) -> Texts(msg) {
@@ -26,6 +27,7 @@ pub fn for_language(language: Language) -> Texts(msg) {
     English -> english()
     Spanish -> spanish()
     Japanese -> japanese()
+    Mandarin -> mandarin()
   }
 }
 
@@ -85,6 +87,26 @@ fn japanese() -> Texts(msg) {
     pictures: "画像",
     games: "ゲーム",
     mastodon: "マストドン",
+    github: "Github",
+  )
+}
+
+fn mandarin() -> Texts(msg) {
+  Texts(
+    introduction: [
+      html.text("我是 Ale，別名 "),
+      html.b([], [html.text("agj")]),
+      html.text("。"),
+      html.br([]),
+      html.text("這裡有的是："),
+    ],
+    less_maintained: [html.text("不太被維修的東西：")],
+    elsewhere: [html.text("別處的我：")],
+    blog: "部落格",
+    portfolio: "作品集",
+    pictures: "圖片",
+    games: "遊戲",
+    mastodon: "Mastodon",
     github: "Github",
   )
 }

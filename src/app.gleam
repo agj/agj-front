@@ -11,7 +11,7 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
-import texts.{type Language, type Texts, English, Japanese, Spanish}
+import texts.{type Language, type Texts, English, Japanese, Mandarin, Spanish}
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -118,9 +118,9 @@ fn view(model: Model) -> Element(Msg) {
     block(
       anchor: BottomLeft,
       x: 5,
-      y: 5,
+      y: 2,
       width: 7,
-      height: 5,
+      height: 11,
       attrs: [attribute.styles([#("align-items", "center")])],
       content: list.flatten([
         [
@@ -138,6 +138,10 @@ fn view(model: Model) -> Element(Msg) {
         },
         case model.language == Japanese {
           False -> [msg_button("日本語", msg: LanguageSelected(Japanese))]
+          True -> []
+        },
+        case model.language == Mandarin {
+          False -> [msg_button("中文", msg: LanguageSelected(Mandarin))]
           True -> []
         },
       ]),
