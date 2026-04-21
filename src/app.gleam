@@ -35,7 +35,7 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
 fn view(_: Model) -> Element(Msg) {
   html.div([attribute.class("container")], [
     html.style([], global_css()),
-    block(anchor: TopLeft, x: 0, y: 0, width: 18, height: 16, content: [
+    block(anchor: TopLeft, x: 0, y: 0, width: 18, height: 9, content: [
       html.p([], [
         html.text("I'm Ale, otherwise known as "),
         html.b([], [html.text("agj")]),
@@ -51,6 +51,8 @@ fn view(_: Model) -> Element(Msg) {
           html.b([], [link("portfolio", to: "https://agj.cl/portfolio/")]),
         ]),
       ]),
+    ]),
+    block(anchor: TopLeft, x: 10, y: 6, width: 17, height: 8, content: [
       html.p([], [html.text("Less maintained but still here:")]),
       html.ul([], [
         item([
@@ -61,7 +63,7 @@ fn view(_: Model) -> Element(Msg) {
         ]),
       ]),
     ]),
-    block(anchor: BottomRight, x: 0, y: 0, width: 12, height: 10, content: [
+    block(anchor: BottomRight, x: 0, y: 0, width: 11, height: 10, content: [
       html.p([], [html.text("Elsewhere:")]),
       html.ul([], [
         item([
