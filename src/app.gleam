@@ -11,6 +11,7 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import texts.{type Language, type Texts, English, Japanese, Spanish}
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -23,29 +24,26 @@ type Msg {
   LanguageSelected(Language)
 }
 
-type Language {
-  English
-  Spanish
-  Japanese
-}
-
 type Model {
-  Model(language: Language)
+  Model(language: Language, texts: Texts)
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
-  #(Model(language: English), effect.none())
+  #(Model(language: English, texts: texts.for_language(English)), effect.none())
 }
 
 fn update(_model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
-    LanguageSelected(language) -> #(Model(language:), effect.none())
+    LanguageSelected(language) -> #(
+      Model(language:, texts: texts.for_language(language)),
+      effect.none(),
+    )
   }
 }
 
 // VIEW
 
-fn view(_: Model) -> Element(Msg) {
+fn view(model: Model) -> Element(Msg) {
   html.div([attribute.class("container")], [
     html.style([], global_css()),
     block(
@@ -65,10 +63,12 @@ fn view(_: Model) -> Element(Msg) {
         ]),
         html.ul([], [
           item([
-            html.b([], [link("blog", to: "https://blog.agj.cl/")]),
+            html.b([], [link(model.texts.blog, to: "https://blog.agj.cl/")]),
           ]),
           item([
-            html.b([], [link("portfolio", to: "https://agj.cl/portfolio/")]),
+            html.b([], [
+              link(model.texts.portfolio, to: "https://agj.cl/portfolio/"),
+            ]),
           ]),
         ]),
       ],
@@ -128,13 +128,25 @@ fn view(_: Model) -> Element(Msg) {
       width: 7,
       height: 5,
       attrs: [attribute.styles([#("align-items", "center")])],
-      content: [
-        html.span([attribute.styles([#("font-size", rem_(1.5))])], [
-          icon.globe() |> icon.view() |> element.map(never),
-        ]),
-        msg_button("Español", msg: LanguageSelected(Spanish)),
-        msg_button("日本語", msg: LanguageSelected(Japanese)),
-      ],
+      content: list.flatten([
+        [
+          html.span([attribute.styles([#("font-size", rem_(1.5))])], [
+            icon.globe() |> icon.view() |> element.map(never),
+          ]),
+        ],
+        case model.language == English {
+          False -> [msg_button("English", msg: LanguageSelected(English))]
+          True -> []
+        },
+        case model.language == Spanish {
+          False -> [msg_button("Español", msg: LanguageSelected(Spanish))]
+          True -> []
+        },
+        case model.language == Japanese {
+          False -> [msg_button("日本語", msg: LanguageSelected(Japanese))]
+          True -> []
+        },
+      ]),
     ),
   ])
 }
@@ -241,12 +253,4 @@ fn rem(n: Int) -> String {
 
 fn rem_(n: Float) -> String {
   { float.to_string(n) } <> "rem"
-}
-
-fn px(n: Int) -> String {
-  { int.to_string(n) } <> "px"
-}
-
-fn pct(n: Int) -> String {
-  { int.to_string(n) } <> "%"
 }
