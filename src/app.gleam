@@ -1,13 +1,16 @@
 import css_svg
+import funtil.{never}
+import gleam/float
 import gleam/int
 import gleam/list
 import gleam/string
 import icon
 import lustre
-import lustre/attribute
+import lustre/attribute.{type Attribute}
 import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
+import lustre/event
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -16,18 +19,28 @@ pub fn main() -> Nil {
   Nil
 }
 
-type Msg =
-  Nil
-
-type Model =
-  Nil
-
-fn init(_) -> #(Model, Effect(Msg)) {
-  #(Nil, effect.none())
+type Msg {
+  LanguageSelected(Language)
 }
 
-fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
-  #(Nil, effect.none())
+type Language {
+  English
+  Spanish
+  Japanese
+}
+
+type Model {
+  Model(language: Language)
+}
+
+fn init(_) -> #(Model, Effect(Msg)) {
+  #(Model(language: English), effect.none())
+}
+
+fn update(_model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
+  case msg {
+    LanguageSelected(language) -> #(Model(language:), effect.none())
+  }
 }
 
 // VIEW
@@ -35,55 +48,94 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
 fn view(_: Model) -> Element(Msg) {
   html.div([attribute.class("container")], [
     html.style([], global_css()),
-    block(anchor: TopLeft, x: 0, y: 0, width: 18, height: 9, content: [
-      html.p([], [
-        html.text("I'm Ale, otherwise known as "),
-        html.b([], [html.text("agj")]),
-        html.text("."),
-        html.br([]),
-        html.text("My things:"),
-      ]),
-      html.ul([], [
-        item([
-          html.b([], [link("blog", to: "https://blog.agj.cl/")]),
+    block(
+      anchor: TopLeft,
+      x: 0,
+      y: 0,
+      width: 18,
+      height: 9,
+      attrs: [],
+      content: [
+        html.p([], [
+          html.text("I'm Ale, otherwise known as "),
+          html.b([], [html.text("agj")]),
+          html.text("."),
+          html.br([]),
+          html.text("My things:"),
         ]),
-        item([
-          html.b([], [link("portfolio", to: "https://agj.cl/portfolio/")]),
+        html.ul([], [
+          item([
+            html.b([], [link("blog", to: "https://blog.agj.cl/")]),
+          ]),
+          item([
+            html.b([], [link("portfolio", to: "https://agj.cl/portfolio/")]),
+          ]),
         ]),
-      ]),
-    ]),
-    block(anchor: TopLeft, x: 10, y: 6, width: 17, height: 8, content: [
-      html.p([], [html.text("Less maintained but still here:")]),
-      html.ul([], [
-        item([
-          link("pictures", to: "https://piclog.agj.cl/"),
+      ],
+    ),
+    block(
+      anchor: TopLeft,
+      x: 10,
+      y: 6,
+      width: 17,
+      height: 8,
+      attrs: [],
+      content: [
+        html.p([], [html.text("Less maintained but still here:")]),
+        html.ul([], [
+          item([
+            link("pictures", to: "https://piclog.agj.cl/"),
+          ]),
+          item([
+            link("games", to: "https://agj.cl/games/"),
+          ]),
         ]),
-        item([
-          link("games", to: "https://agj.cl/games/"),
+      ],
+    ),
+    block(
+      anchor: BottomRight,
+      x: 0,
+      y: 0,
+      width: 11,
+      height: 10,
+      attrs: [],
+      content: [
+        html.p([], [html.text("Elsewhere:")]),
+        html.ul([], [
+          item([
+            icon.envelope() |> icon.view() |> element.map(never),
+            html.text(" ale"),
+            icon.at_sign() |> icon.view() |> element.map(never),
+            html.text("agj.cl"),
+          ]),
+          item([
+            icon.mastodon() |> icon.view() |> element.map(never),
+            html.text(" "),
+            link_ext("Mastodon", to: "https://mstdn.social/@agj"),
+          ]),
+          item([
+            icon.github() |> icon.view() |> element.map(never),
+            html.text(" "),
+            link_ext("Github", to: "https://github.com/agj"),
+          ]),
         ]),
-      ]),
-    ]),
-    block(anchor: BottomRight, x: 0, y: 0, width: 11, height: 10, content: [
-      html.p([], [html.text("Elsewhere:")]),
-      html.ul([], [
-        item([
-          icon.envelope() |> icon.view(),
-          html.text(" ale"),
-          icon.at_sign() |> icon.view(),
-          html.text("agj.cl"),
+      ],
+    ),
+    block(
+      anchor: BottomLeft,
+      x: 5,
+      y: 5,
+      width: 7,
+      height: 5,
+      attrs: [attribute.styles([#("align-items", "center")])],
+      content: [
+        html.span([attribute.styles([#("font-size", rem_(1.5))])], [
+          icon.globe() |> icon.view() |> element.map(never),
         ]),
-        item([
-          icon.mastodon() |> icon.view(),
-          html.text(" "),
-          link_ext("Mastodon", to: "https://mstdn.social/@agj"),
-        ]),
-        item([
-          icon.github() |> icon.view(),
-          html.text(" "),
-          link_ext("Github", to: "https://github.com/agj"),
-        ]),
-      ]),
-    ]),
+        msg_button("Español", msg: LanguageSelected(Spanish)),
+        msg_button("日本語", msg: LanguageSelected(Japanese)),
+      ],
+    ),
   ])
 }
 
@@ -117,6 +169,7 @@ type Anchor {
 }
 
 fn block(
+  attrs attrs: List(Attribute(Msg)),
   content content: List(Element(Msg)),
   anchor anchor: Anchor,
   x x: Int,
@@ -140,12 +193,16 @@ fn block(
         }
       ]),
     ],
-    [html.div([], content)],
+    [html.div(attrs, content)],
   )
 }
 
 fn item(content: List(Element(Msg))) -> Element(Msg) {
-  html.li([], [icon.arrow_right() |> icon.view(), html.text(" "), ..content])
+  html.li([], [
+    icon.arrow_right() |> icon.view() |> element.map(never),
+    html.text(" "),
+    ..content
+  ])
 }
 
 fn link(label: String, to url: String) -> Element(Msg) {
@@ -154,6 +211,10 @@ fn link(label: String, to url: String) -> Element(Msg) {
 
 fn link_ext(label: String, to url: String) -> Element(Msg) {
   html.a([attribute.href(url), attribute.target("_blank")], [html.text(label)])
+}
+
+fn msg_button(label: String, msg msg: Msg) -> Element(Msg) {
+  html.button([event.on_click(msg)], [html.text(label)])
 }
 
 // CSS UTILITIES
@@ -176,6 +237,10 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
 
 fn rem(n: Int) -> String {
   { int.to_string(n) } <> "rem"
+}
+
+fn rem_(n: Float) -> String {
+  { float.to_string(n) } <> "rem"
 }
 
 fn px(n: Int) -> String {

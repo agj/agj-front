@@ -1,3 +1,4 @@
+import funtil.{type Never}
 import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
 import lustre/element/html
@@ -8,13 +9,13 @@ pub opaque type Icon {
 }
 
 type PhosphorIcon =
-  fn(List(Attribute(Nil))) -> Element(Nil)
+  fn(List(Attribute(Never))) -> Element(Never)
 
 fn to_icon(icon_fn: PhosphorIcon) -> Icon {
   Icon(function: icon_fn)
 }
 
-pub fn view(icon: Icon) -> Element(Nil) {
+pub fn view(icon: Icon) -> Element(Never) {
   html.div([attribute.class("icon")], [icon.function([])])
 }
 
@@ -38,4 +39,8 @@ pub fn github() -> Icon {
 
 pub fn arrow_right() -> Icon {
   phosphor.arrow_right_regular |> to_icon
+}
+
+pub fn globe() -> Icon {
+  phosphor.globe_regular |> to_icon
 }
