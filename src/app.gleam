@@ -25,7 +25,7 @@ type Msg {
 }
 
 type Model {
-  Model(language: Language, texts: Texts)
+  Model(language: Language, texts: Texts(Msg))
 }
 
 fn init(_) -> #(Model, Effect(Msg)) {
@@ -54,13 +54,7 @@ fn view(model: Model) -> Element(Msg) {
       height: 9,
       attrs: [],
       content: [
-        html.p([], [
-          html.text("I'm Ale, otherwise known as "),
-          html.b([], [html.text("agj")]),
-          html.text("."),
-          html.br([]),
-          html.text("My things:"),
-        ]),
+        html.p([], model.texts.introduction),
         html.ul([], [
           item([
             html.b([], [link(model.texts.blog, to: "https://blog.agj.cl/")]),
@@ -74,20 +68,20 @@ fn view(model: Model) -> Element(Msg) {
       ],
     ),
     block(
-      anchor: TopLeft,
-      x: 10,
+      anchor: TopRight,
+      x: 4,
       y: 6,
-      width: 17,
+      width: 15,
       height: 8,
       attrs: [],
       content: [
-        html.p([], [html.text("Less maintained but still here:")]),
+        html.p([], model.texts.less_maintained),
         html.ul([], [
           item([
-            link("pictures", to: "https://piclog.agj.cl/"),
+            link(model.texts.pictures, to: "https://piclog.agj.cl/"),
           ]),
           item([
-            link("games", to: "https://agj.cl/games/"),
+            link(model.texts.games, to: "https://agj.cl/games/"),
           ]),
         ]),
       ],
@@ -100,7 +94,7 @@ fn view(model: Model) -> Element(Msg) {
       height: 10,
       attrs: [],
       content: [
-        html.p([], [html.text("Elsewhere:")]),
+        html.p([], model.texts.elsewhere),
         html.ul([], [
           item([
             icon.envelope() |> icon.view() |> element.map(never),
@@ -111,12 +105,12 @@ fn view(model: Model) -> Element(Msg) {
           item([
             icon.mastodon() |> icon.view() |> element.map(never),
             html.text(" "),
-            link_ext("Mastodon", to: "https://mstdn.social/@agj"),
+            link_ext(model.texts.mastodon, to: "https://mstdn.social/@agj"),
           ]),
           item([
             icon.github() |> icon.view() |> element.map(never),
             html.text(" "),
-            link_ext("Github", to: "https://github.com/agj"),
+            link_ext(model.texts.github, to: "https://github.com/agj"),
           ]),
         ]),
       ],
