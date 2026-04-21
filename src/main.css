@@ -26,6 +26,14 @@ a {
   text-underline-offset: 0em;
 }
 
+.container {
+  height: 30rem;
+  position: relative;
+  width: 30rem;
+  /* Temporary, to more easily do the layout. */
+  outline: 0.2rem solid white;
+}
+
 .block {
   background-color: var(--background-color);
   padding: 1rem;

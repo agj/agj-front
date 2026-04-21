@@ -33,13 +33,15 @@ fn update(_: Msg, _: Model) -> #(Model, Effect(Msg)) {
 // VIEW
 
 fn view(_: Model) -> Element(Msg) {
-  html.div([], [
+  html.div([attribute.class("container")], [
     html.style([], global_css()),
-    block(w: 17, h: 16, left: -10, top: -10, content: [
+    block(anchor: TopLeft, x: 0, y: 0, width: 18, height: 16, content: [
       html.p([], [
         html.text("I'm Ale, otherwise known as "),
         html.b([], [html.text("agj")]),
-        html.text(". My things:"),
+        html.text("."),
+        html.br([]),
+        html.text("My things:"),
       ]),
       html.ul([], [
         item([
@@ -59,7 +61,7 @@ fn view(_: Model) -> Element(Msg) {
         ]),
       ]),
     ]),
-    block(w: 12, h: 10, left: 0, top: 5, content: [
+    block(anchor: BottomRight, x: 0, y: 0, width: 12, height: 10, content: [
       html.p([], [html.text("Elsewhere:")]),
       html.ul([], [
         item([
@@ -105,21 +107,35 @@ const tertiary_color = "white"
 
 // HTML UTILITIES
 
+type Anchor {
+  TopLeft
+  TopRight
+  BottomLeft
+  BottomRight
+}
+
 fn block(
   content content: List(Element(Msg)),
-  w w: Int,
-  h h: Int,
-  left left: Int,
-  top top: Int,
+  anchor anchor: Anchor,
+  x x: Int,
+  y y: Int,
+  width width: Int,
+  height height: Int,
 ) -> Element(Msg) {
   html.section(
     [
       attribute.class("block"),
       attribute.styles([
-        #("left", "calc(50vw + " <> { int.to_string(left) } <> "rem)"),
-        #("min-height", rem(h)),
-        #("top", "calc(50vh + " <> { int.to_string(top) } <> "rem)"),
-        #("width", rem(w)),
+        #("min-height", rem(height)),
+        #("width", rem(width)),
+        ..{
+          case anchor {
+            TopLeft -> [#("top", rem(y)), #("left", rem(x))]
+            TopRight -> [#("top", rem(y)), #("right", rem(x))]
+            BottomLeft -> [#("bottom", rem(y)), #("left", rem(x))]
+            BottomRight -> [#("bottom", rem(y)), #("right", rem(x))]
+          }
+        }
       ]),
     ],
     [html.div([], content)],
