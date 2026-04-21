@@ -1,5 +1,6 @@
 import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
+import lustre/element/html
 import phosphor
 
 pub opaque type Icon {
@@ -14,7 +15,7 @@ fn to_icon(icon_fn: PhosphorIcon) -> Icon {
 }
 
 pub fn view(icon: Icon) -> Element(Nil) {
-  icon.function([attribute.class("icon")])
+  html.div([attribute.class("icon")], [icon.function([])])
 }
 
 // ICONS

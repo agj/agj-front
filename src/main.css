@@ -55,6 +55,12 @@ li {
 /* MORE */
 
 .icon {
-  baseline-shift: -0.23em;
-  display: inline;
+  display: inline-block;
+  height: 1em;
+  vertical-align: center;
+}
+
+.icon > svg {
+  position: relative;
+  top: 0.1em;
 }
