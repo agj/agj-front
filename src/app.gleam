@@ -97,9 +97,9 @@ fn global_css() -> String {
 
 // CONSTANTS
 
-const foreground_color = "#4b4f59"
+const foreground_color = "#616878"
 
-const background_color = "#f3cbe5"
+const background_color = "#f5d9e5"
 
 const tertiary_color = "white"
 
