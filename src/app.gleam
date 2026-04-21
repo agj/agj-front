@@ -43,10 +43,10 @@ fn view(_: Model) -> Element(Msg) {
       ]),
       html.ul([], [
         item([
-          link("blog", to: "https://blog.agj.cl/"),
+          html.b([], [link("blog", to: "https://blog.agj.cl/")]),
         ]),
         item([
-          link("portfolio", to: "https://agj.cl/portfolio/"),
+          html.b([], [link("portfolio", to: "https://agj.cl/portfolio/")]),
         ]),
       ]),
       html.p([], [html.text("Less maintained but still here:")]),
