@@ -3,6 +3,7 @@ import funtil.{never}
 import gleam/float
 import gleam/int
 import gleam/list
+import gleam/result
 import gleam/string
 import icon
 import lustre
@@ -11,6 +12,9 @@ import lustre/effect.{type Effect}
 import lustre/element.{type Element}
 import lustre/element/html
 import lustre/event
+import plinth/browser/document
+import plinth/browser/element as pelement
+import plinth/browser/event as pevent
 import texts.{type Language, type Texts, English, Japanese, Mandarin, Spanish}
 
 pub fn main() -> Nil {
@@ -23,6 +27,7 @@ pub fn main() -> Nil {
 type Msg {
   LanguageSelectionRequested(Bool)
   LanguageSelected(Language)
+  ClickedOutsideLanguageSelection
 }
 
 type Model {
@@ -36,7 +41,11 @@ fn init(_) -> #(Model, Effect(Msg)) {
       language_selection_open: False,
       texts: texts.for_language(English),
     ),
-    effect.none(),
+    on_click_outside(
+      [language_change_button_class, language_selection_menu_class]
+        |> list.map(class_to_selector),
+      ClickedOutsideLanguageSelection,
+    ),
   )
 }
 
@@ -52,6 +61,10 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         texts: texts.for_language(language),
         language_selection_open: False,
       ),
+      effect.none(),
+    )
+    ClickedOutsideLanguageSelection -> #(
+      Model(..model, language_selection_open: False),
       effect.none(),
     )
   }
@@ -146,16 +159,16 @@ fn view(model: Model) -> Element(Msg) {
       width: 3,
       height: 3,
       attrs: [
-        attribute.class("language-change"),
+        attribute.class(language_change_button_class),
       ],
       content: [
         html.button(
           [
-            event.on_click(LanguageSelectionRequested(True)),
+            event.on_click(LanguageSelectionRequested(
+              !model.language_selection_open,
+            )),
           ],
-          [
-            icon.globe() |> icon.view() |> element.map(never),
-          ],
+          [icon.globe() |> icon.view() |> element.map(never)],
         ),
       ],
     ),
@@ -168,6 +181,7 @@ fn view(model: Model) -> Element(Msg) {
       width: 9,
       height: 12,
       attrs: [
+        attribute.class(language_selection_menu_class),
         case model.language_selection_open {
           True -> attribute.none()
           False -> attribute.class("hidden")
@@ -225,6 +239,10 @@ const foreground_color = "#616878"
 const background_color = "#f5d9e5"
 
 const tertiary_color = "white"
+
+const language_change_button_class = "language-change"
+
+const language_selection_menu_class = "language-selection-menu"
 
 // HTML UTILITIES
 
@@ -304,4 +322,36 @@ fn rem(n: Int) -> String {
 
 fn rem_(n: Float) -> String {
   { float.to_string(n) } <> "rem"
+}
+
+// OTHER
+
+/// Triggers a message when a click event is triggered in the document but
+/// outside of a list of elements whose DOM selectors you provide.
+fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
+  effect.from(fn(dispatch) {
+    document.add_event_listener("click", fn(event) {
+      let maybe_target = pevent.target(event) |> pelement.cast
+
+      case maybe_target {
+        Ok(target) -> {
+          let is_outside_all_selectors =
+            list.map(selectors, fn(selector) {
+              pelement.query_selector(target, selector)
+            })
+            |> list.all(result.is_ok)
+
+          case is_outside_all_selectors {
+            True -> dispatch(msg)
+            False -> Nil
+          }
+        }
+        Error(_) -> Nil
+      }
+    })
+  })
+}
+
+fn class_to_selector(class: String) -> String {
+  "." <> class
 }

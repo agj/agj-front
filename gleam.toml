@@ -10,6 +10,9 @@ lustre = ">= 5.6.0 and < 6.0.0"
 gleam_regexp = ">= 1.1.1 and < 2.0.0"
 phosphor_lustre = ">= 1.0.1 and < 2.0.0"
 funtil = ">= 1.1.0 and < 2.0.0"
+# See: https://github.com/CrowdHailer/plinth/pull/43
+plinth = { git = "https://github.com/agj/plinth", ref = "fix-query-selector" }
+# plinth = ">= 0.10.2 and < 1.0.0"
 
 [dev_dependencies]
 
