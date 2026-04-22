@@ -147,23 +147,11 @@ fn view(model: Model) -> Element(Msg) {
       height: 3,
       attrs: [
         attribute.class("language-change"),
-        // attribute.styles([
-      //   #("padding", "0"),
-      //   #("width", rem(3)),
-      //   #("height", rem(3)),
-      // ]),
       ],
       content: [
         html.button(
           [
             event.on_click(LanguageSelectionRequested(True)),
-            // attribute.styles([
-          //   #("font-size", rem_(1.5)),
-          //   #("padding", "0"),
-          //   #("flex-grow", "1"),
-          //   #("width", "100%"),
-          //   #("height", "100%"),
-          // ]),
           ],
           [
             icon.globe() |> icon.view() |> element.map(never),
@@ -184,7 +172,6 @@ fn view(model: Model) -> Element(Msg) {
           True -> attribute.none()
           False -> attribute.class("hidden")
         },
-        // attribute.styles([#("align-items", "center")]),
       ],
       content: [
         view_language_button(
@@ -293,10 +280,6 @@ fn link_ext(label: String, to url: String) -> Element(Msg) {
   html.a([attribute.href(url), attribute.target("_blank")], [html.text(label)])
 }
 
-fn msg_button(content: List(Element(Msg)), msg msg: Msg) -> Element(Msg) {
-  html.button([event.on_click(msg)], content)
-}
-
 // CSS UTILITIES
 
 fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
@@ -316,7 +299,7 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
 }
 
 fn rem(n: Int) -> String {
-  { int.to_string(n) } <> "rem"
+  int.to_string(n) <> "rem"
 }
 
 fn rem_(n: Float) -> String {
