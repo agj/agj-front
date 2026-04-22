@@ -27,11 +27,16 @@ a {
 }
 
 button {
-  background-color: var(--tertiary-color);
-  border: none;
+  background-color: var(--background-color);
+  border: 0.2rem solid var(--tertiary-color);
+  color: inherit;
   cursor: pointer;
   padding: 0 0.5em;
   text-align: left;
+
+  &:active {
+    transform: translateY(0.1rem);
+  }
 }
 
 .container {
@@ -68,18 +73,20 @@ button {
 }
 
 .block .language-change {
-  width: 100%;
+  flex-basis: auto;
+  flex-grow: 1;
   height: 100%;
   padding: 0;
-  flex-grow: 1;
-  flex-basis: auto;
+  width: 100%;
 
   button {
-    width: 100%;
-    height: 100%;
-    font-size: 1.5rem;
-    flex-grow: 1;
     flex-basis: auto;
+    flex-grow: 1;
+    font-size: 1.5rem;
+    height: 100%;
+    padding: 0;
+    text-align: center;
+    width: 100%;
 
     .icon > svg {
       top: unset;

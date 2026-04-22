@@ -176,10 +176,10 @@ fn view(model: Model) -> Element(Msg) {
     // Language selection menu.
     block(
       anchor: BottomLeft,
-      x: 5,
-      y: 2,
+      x: 2,
+      y: 5,
       width: 9,
-      height: 12,
+      height: 11,
       attrs: [
         attribute.class(language_selection_menu_class),
         case model.language_selection_open {
