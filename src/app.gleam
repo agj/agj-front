@@ -6,6 +6,8 @@ import gleam/list
 import gleam/result
 import gleam/string
 import icon
+import js
+import language.{type Language, English, Japanese, Mandarin, Spanish}
 import lustre
 import lustre/attribute.{type Attribute}
 import lustre/effect.{type Effect}
@@ -15,13 +17,18 @@ import lustre/event
 import plinth/browser/document
 import plinth/browser/element as pelement
 import plinth/browser/event as pevent
-import texts.{type Language, type Texts, English, Japanese, Mandarin, Spanish}
+import texts.{type Texts}
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
-  let assert Ok(_) = lustre.start(app, "#app", Nil)
+  let assert Ok(_) =
+    lustre.start(app, "#app", Flags(language: get_environment_language()))
 
   Nil
+}
+
+type Flags {
+  Flags(language: Language)
 }
 
 type Msg {
@@ -31,16 +38,12 @@ type Msg {
 }
 
 type Model {
-  Model(language: Language, language_selection_open: Bool, texts: Texts(Msg))
+  Model(language: Language, language_selection_open: Bool)
 }
 
-fn init(_) -> #(Model, Effect(Msg)) {
+fn init(flags: Flags) -> #(Model, Effect(Msg)) {
   #(
-    Model(
-      language: English,
-      language_selection_open: False,
-      texts: texts.for_language(English),
-    ),
+    Model(language: flags.language, language_selection_open: False),
     on_click_outside(
       [language_change_button_class, language_selection_menu_class]
         |> list.map(class_to_selector),
@@ -56,11 +59,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
     LanguageSelected(language) -> #(
-      Model(
-        language:,
-        texts: texts.for_language(language),
-        language_selection_open: False,
-      ),
+      Model(language:, language_selection_open: False),
       effect.none(),
     )
     ClickedOutsideLanguageSelection -> #(
@@ -73,6 +72,8 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 // VIEW
 
 fn view(model: Model) -> Element(Msg) {
+  let texts = texts.for_language(model.language)
+
   html.div([attribute.class("container")], [
     html.style([], global_css()),
 
@@ -85,14 +86,14 @@ fn view(model: Model) -> Element(Msg) {
       height: 9,
       attrs: [],
       content: [
-        html.p([], model.texts.introduction),
+        html.p([], texts.introduction),
         html.ul([], [
           item([
-            html.b([], [link(model.texts.blog, to: "https://blog.agj.cl/")]),
+            html.b([], [link(texts.blog, to: "https://blog.agj.cl/")]),
           ]),
           item([
             html.b([], [
-              link(model.texts.portfolio, to: "https://agj.cl/portfolio/"),
+              link(texts.portfolio, to: "https://agj.cl/portfolio/"),
             ]),
           ]),
         ]),
@@ -108,13 +109,13 @@ fn view(model: Model) -> Element(Msg) {
       height: 8,
       attrs: [],
       content: [
-        html.p([], model.texts.less_maintained),
+        html.p([], texts.less_maintained),
         html.ul([], [
           item([
-            link(model.texts.pictures, to: "https://piclog.agj.cl/"),
+            link(texts.pictures, to: "https://piclog.agj.cl/"),
           ]),
           item([
-            link(model.texts.games, to: "https://agj.cl/games/"),
+            link(texts.games, to: "https://agj.cl/games/"),
           ]),
         ]),
       ],
@@ -129,7 +130,7 @@ fn view(model: Model) -> Element(Msg) {
       height: 10,
       attrs: [],
       content: [
-        html.p([], model.texts.elsewhere),
+        html.p([], texts.elsewhere),
         html.ul([], [
           item([
             icon.envelope() |> icon.view() |> element.map(never),
@@ -140,12 +141,12 @@ fn view(model: Model) -> Element(Msg) {
           item([
             icon.mastodon() |> icon.view() |> element.map(never),
             html.text(" "),
-            link_ext(model.texts.mastodon, to: "https://mstdn.social/@agj"),
+            link_ext(texts.mastodon, to: "https://mstdn.social/@agj"),
           ]),
           item([
             icon.github() |> icon.view() |> element.map(never),
             html.text(" "),
-            link_ext(model.texts.github, to: "https://github.com/agj"),
+            link_ext(texts.github, to: "https://github.com/agj"),
           ]),
         ]),
       ],
@@ -354,4 +355,11 @@ fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
 
 fn class_to_selector(class: String) -> String {
   "." <> class
+}
+
+fn get_environment_language() -> Language {
+  js.languages()
+  |> list.filter_map(language.parse_code)
+  |> list.first
+  |> result.unwrap(English)
 }

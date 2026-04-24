@@ -1,3 +1,4 @@
+import language.{type Language, English, Japanese, Mandarin, Spanish}
 import lustre/element.{type Element}
 import lustre/element/html
 
@@ -13,13 +14,6 @@ pub type Texts(msg) {
     mastodon: String,
     github: String,
   )
-}
-
-pub type Language {
-  English
-  Spanish
-  Japanese
-  Mandarin
 }
 
 pub fn for_language(language: Language) -> Texts(msg) {
