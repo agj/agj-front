@@ -16,3 +16,12 @@ pub fn parse_code(code: String) -> Result(Language, Nil) {
     _ -> Error(Nil)
   }
 }
+
+pub fn to_string(language: Language) -> String {
+  case language {
+    English -> "en"
+    Spanish -> "es"
+    Japanese -> "ja"
+    Mandarin -> "zh"
+  }
+}

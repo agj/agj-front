@@ -12,6 +12,7 @@ phosphor_lustre = ">= 1.0.1 and < 2.0.0"
 funtil = ">= 1.1.0 and < 2.0.0"
 # See: https://github.com/CrowdHailer/plinth/pull/43
 plinth = { git = "https://github.com/agj/plinth", ref = "fix-query-selector" }
+gleam_json = ">= 3.1.0 and < 4.0.0"
 # plinth = ">= 0.10.2 and < 1.0.0"
 
 [dev_dependencies]

@@ -1,3 +1,4 @@
+import config
 import css_svg
 import funtil.{never}
 import gleam/float
@@ -17,7 +18,7 @@ import lustre/event
 import plinth/browser/document
 import plinth/browser/element as pelement
 import plinth/browser/event as pevent
-import texts.{type Texts}
+import texts
 
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
@@ -60,7 +61,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     )
     LanguageSelected(language) -> #(
       Model(language:, language_selection_open: False),
-      effect.none(),
+      config.save(config.Config(language:)),
     )
     ClickedOutsideLanguageSelection -> #(
       Model(..model, language_selection_open: False),
