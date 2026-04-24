@@ -342,26 +342,26 @@ fn rem_(n: Float) -> String {
 /// Triggers a message when a click event is triggered in the document but
 /// outside of a list of elements whose DOM selectors you provide.
 fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
-  effect.from(fn(dispatch) {
-    document.add_event_listener("click", fn(event) {
-      let maybe_target = pevent.target(event) |> pelement.cast
+  use dispatch <- effect.from
 
-      case maybe_target {
-        Ok(target) -> {
-          let is_outside_all_selectors =
-            list.map(selectors, fn(selector) {
-              pelement.query_selector(target, selector)
-            })
-            |> list.all(result.is_ok)
+  document.add_event_listener("click", fn(event) {
+    let maybe_target = pevent.target(event) |> pelement.cast
 
-          case is_outside_all_selectors {
-            True -> dispatch(msg)
-            False -> Nil
-          }
+    case maybe_target {
+      Ok(target) -> {
+        let is_outside_all_selectors =
+          list.map(selectors, fn(selector) {
+            pelement.query_selector(target, selector)
+          })
+          |> list.all(result.is_ok)
+
+        case is_outside_all_selectors {
+          True -> dispatch(msg)
+          False -> Nil
         }
-        Error(_) -> Nil
       }
-    })
+      Error(_) -> Nil
+    }
   })
 }
 

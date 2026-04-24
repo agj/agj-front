@@ -26,28 +26,26 @@ pub fn decoder() -> Decoder(Config) {
 }
 
 pub fn read(to_msg: fn(Result(Config, Nil)) -> msg) -> Effect(msg) {
-  effect.from(fn(dispatch) {
-    storage.local()
-    |> result.try(fn(local_storage) {
-      use json_string <- result.try(storage.get_item(local_storage, "config"))
-      let config_result =
-        from_json(json_string) |> result.map_error(fn(_) { Nil })
+  use dispatch <- effect.from
 
-      dispatch(to_msg(config_result))
+  storage.local()
+  |> result.try(fn(local_storage) {
+    use json_string <- result.try(storage.get_item(local_storage, "config"))
+    let config_result =
+      from_json(json_string) |> result.map_error(fn(_) { Nil })
 
-      Ok(Nil)
-    })
-
-    Nil
+    dispatch(to_msg(config_result))
+    |> Ok
   })
+  |> result.unwrap(Nil)
 }
 
 pub fn save(config: Config) -> Effect(x) {
-  effect.from(fn(_) {
-    storage.local()
-    |> result.try(fn(local_storage) {
-      storage.set_item(local_storage, "config", to_json(config))
-    })
-    |> result.unwrap(Nil)
+  use _ <- effect.from
+
+  storage.local()
+  |> result.try(fn(local_storage) {
+    storage.set_item(local_storage, "config", to_json(config))
   })
+  |> result.unwrap(Nil)
 }
