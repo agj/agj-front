@@ -1,3 +1,4 @@
+import gleam/dynamic/decode.{type Decoder}
 import gleam/string
 
 pub type Language {
@@ -23,5 +24,14 @@ pub fn to_string(language: Language) -> String {
     Spanish -> "es"
     Japanese -> "ja"
     Mandarin -> "zh"
+  }
+}
+
+pub fn decoder() -> Decoder(Language) {
+  use result <- decode.then(decode.string |> decode.map(parse_code))
+
+  case result {
+    Ok(language) -> decode.success(language)
+    Error(_) -> decode.failure(English, "Language")
   }
 }

@@ -1,4 +1,4 @@
-import config
+import config.{type Config}
 import css_svg
 import funtil.{never}
 import gleam/float
@@ -33,6 +33,7 @@ type Flags {
 }
 
 type Msg {
+  GotSavedConfig(Result(Config, Nil))
   LanguageSelectionRequested(Bool)
   LanguageSelected(Language)
   ClickedOutsideLanguageSelection
@@ -45,16 +46,26 @@ type Model {
 fn init(flags: Flags) -> #(Model, Effect(Msg)) {
   #(
     Model(language: flags.language, language_selection_open: False),
-    on_click_outside(
-      [language_change_button_class, language_selection_menu_class]
-        |> list.map(class_to_selector),
-      ClickedOutsideLanguageSelection,
-    ),
+    effect.batch([
+      config.read(GotSavedConfig),
+      on_click_outside(
+        [language_change_button_class, language_selection_menu_class]
+          |> list.map(class_to_selector),
+        ClickedOutsideLanguageSelection,
+      ),
+    ]),
   )
 }
 
 fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
   case msg {
+    GotSavedConfig(Ok(config)) -> #(
+      Model(..model, language: config.language),
+      effect.none(),
+    )
+
+    GotSavedConfig(Error(Nil)) -> #(model, effect.none())
+
     LanguageSelectionRequested(open) -> #(
       Model(..model, language_selection_open: open),
       effect.none(),
