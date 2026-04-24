@@ -115,7 +115,7 @@ fn view(model: Model) -> Element(Msg) {
     // "Less maintained" block.
     block(
       anchor: TopRight,
-      x: 4,
+      x: 0,
       y: 6,
       width: 15,
       height: 8,
@@ -136,7 +136,7 @@ fn view(model: Model) -> Element(Msg) {
     // "Elsewhere" block.
     block(
       anchor: BottomRight,
-      x: 0,
+      x: 2,
       y: 0,
       width: 11,
       height: 10,
