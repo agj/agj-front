@@ -8,9 +8,16 @@ port := "1233"
 dev: install
   pnpm exec vite --port {{port}} --clearScreen false
 
-# Serve the output build. Useful to check on mobile.
+# Serve the output build and rebuild on changes. Useful to check on mobile.
 serve: install build qr
-  pnpm exec vite preview --port {{port}} --clearScreen false --host
+  #!/usr/bin/env nu
+  (interleave
+    { pnpm exec vite preview --port {{port}} --clearScreen false --host }
+    { watch ./src/ --debounce 1sec
+      | where operation == "Write"
+      | each { just build }
+    }
+  )
 
 # Build for release.
 build: install
