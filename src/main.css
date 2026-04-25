@@ -1,11 +1,17 @@
 :root {
+  --container-size: 26; /* rem */
+
   background-color: var(--background-color);
   background-image: var(--background-image);
   background-position: top 50vh left 50vw;
   background-size: 1rem;
   color: var(--foreground-color);
   font-family: sans-serif;
-  font-size: 19px;
+  font-size: min(
+    19px,
+    calc(100vw / (var(--container-size) + 2)),
+    calc(100vh / (var(--container-size) + 2))
+  );
   height: 100%;
   padding: 0;
 }
@@ -41,9 +47,9 @@ button {
 }
 
 .container {
-  height: 26rem;
+  height: calc(var(--container-size) * 1rem);
   position: relative;
-  width: 26rem;
+  width: calc(var(--container-size) * 1rem);
   /* Temporary, to more easily do the layout. */
   outline: 0.2rem solid white;
 }
