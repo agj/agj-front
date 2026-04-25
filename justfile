@@ -6,7 +6,11 @@ port := "1233"
 
 # Run the development server.
 dev: install
-  pnpm exec vite --port {{port}} --clearScreen false --host
+  pnpm exec vite --port {{port}} --clearScreen false
+
+# Serve the output build. Useful to check on mobile.
+serve: install build qr
+  pnpm exec vite preview --port {{port}} --clearScreen false --host
 
 # Build for release.
 build: install
@@ -20,3 +24,11 @@ deploy: build
 [private]
 install:
   pnpm install
+
+[private]
+qr:
+    #!/usr/bin/env nu
+    let ip = sys net | where name == "en0" | get 0.ip | where protocol == "ipv4" | get 0.address
+    let url = $"http://($ip):{{port}}"
+    qrtool encode -t unicode $url
+    print $url

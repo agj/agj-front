@@ -27,6 +27,7 @@
             pkgs.nushell
             pkgs.pnpm
             pkgs.prettier
+            pkgs.qrtool
           ];
         };
       }
