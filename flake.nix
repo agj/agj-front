@@ -1,10 +1,6 @@
 {
   inputs = {
-    # Temporarily on master due to Nushell issue.
-    # See: https://github.com/NixOS/nixpkgs/issues/510488
-    # See: https://nixpk.gs/pr-tracker.html?pr=510439
-    nixpkgs.url = "github:nixos/nixpkgs/master";
-    # nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
