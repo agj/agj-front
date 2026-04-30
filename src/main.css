@@ -2,7 +2,7 @@
   --container-size: 26;
   --u: var(--u-regular);
   --u-regular: 19px;
-  --u-small: 14px;
+  --u-small: 16px;
 
   background-color: var(--background-color);
   background-image: var(--background-image);
@@ -77,7 +77,6 @@ p {
     gap: 0.5rem;
     justify-content: center;
     padding: 1rem;
-    z-index: 1;
   }
 
   &.block-introduction {
@@ -165,20 +164,28 @@ li {
 
 /* RESPONSIVENESS */
 
-@media (width < 494px) {
-  /* 👆 container-size * u-regular */
-
+@media ((width < 500px) or (height < 500px)) {
   :root {
-    /* Decrease unit size when viewport is too small, making everything smaller. */
     --u: var(--u-small);
-  }
-}
 
-@media (width < 364px) {
-  /* 👆 container-size * u-small */
+    background-position: top 0 left 50vw;
+  }
+
+  body {
+    align-items: start;
+  }
 
   .container {
-    /* Make container width fit viewport width when there's not enough room. */
-    width: 100vw;
+    height: 27rem;
+    margin: 1rem 0;
+    max-width: 20rem;
+    position: relative;
+    width: 20rem;
+  }
+
+  .block {
+    &.block-unmaintained {
+      top: 8rem;
+    }
   }
 }
