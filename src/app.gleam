@@ -49,7 +49,8 @@ fn init(flags: Flags) -> #(Model, Effect(Msg)) {
     effect.batch([
       config.read(GotSavedConfig),
       on_click_outside(
-        [language_change_button_class, language_selection_menu_class]
+        [language_change_block_name, language_selection_block_name]
+          |> list.map(block_name_to_class)
           |> list.map(class_to_selector),
         ClickedOutsideLanguageSelection,
       ),
@@ -89,118 +90,73 @@ fn view(model: Model) -> Element(Msg) {
   html.div([attribute.class("container")], [
     html.style([], global_css()),
 
-    // "Introduction" block.
-    block(
-      anchor: TopLeft,
-      x: 0,
-      y: 0,
-      width: 18,
-      height: 9,
-      attrs: [],
-      content: [
-        html.p([], texts.introduction),
-        html.ul([], [
-          item([
-            html.b([], [link(texts.blog, to: "https://blog.agj.cl/")]),
-          ]),
-          item([
-            html.b([], [
-              link(texts.portfolio, to: "https://agj.cl/portfolio/"),
-            ]),
+    block("introduction", [], [
+      html.p([], texts.introduction),
+      html.ul([], [
+        item([
+          html.b([], [link(texts.blog, to: "https://blog.agj.cl/")]),
+        ]),
+        item([
+          html.b([], [
+            link(texts.portfolio, to: "https://agj.cl/portfolio/"),
           ]),
         ]),
-      ],
-    ),
+      ]),
+    ]),
 
-    // "Less maintained" block.
-    block(
-      anchor: TopRight,
-      x: 0,
-      y: 6,
-      width: 15,
-      height: 8,
-      attrs: [],
-      content: [
-        html.p([], texts.less_maintained),
-        html.ul([], [
-          item([
-            link(texts.pictures, to: "https://piclog.agj.cl/"),
-          ]),
-          item([
-            link(texts.games, to: "https://agj.cl/games/"),
-          ]),
+    block("unmaintained", [], [
+      html.p([], texts.less_maintained),
+      html.ul([], [
+        item([
+          link(texts.pictures, to: "https://piclog.agj.cl/"),
         ]),
-      ],
-    ),
-
-    // "Elsewhere" block.
-    block(
-      anchor: BottomRight,
-      x: 2,
-      y: 0,
-      width: 11,
-      height: 10,
-      attrs: [],
-      content: [
-        html.p([], texts.elsewhere),
-        html.ul([], [
-          item([
-            icon.envelope() |> icon.view() |> element.map(never),
-            html.text(" ale"),
-            icon.at_sign() |> icon.view() |> element.map(never),
-            html.text("agj.cl"),
-          ]),
-          item([
-            icon.mastodon() |> icon.view() |> element.map(never),
-            html.text(" "),
-            link_ext(texts.mastodon, to: "https://mstdn.social/@agj"),
-          ]),
-          item([
-            icon.github() |> icon.view() |> element.map(never),
-            html.text(" "),
-            link_ext(texts.github, to: "https://github.com/agj"),
-          ]),
+        item([
+          link(texts.games, to: "https://agj.cl/games/"),
         ]),
-      ],
-    ),
+      ]),
+    ]),
 
-    // Language change button.
-    block(
-      anchor: BottomLeft,
-      x: 2,
-      y: 2,
-      width: 3,
-      height: 3,
-      attrs: [
-        attribute.class(language_change_button_class),
-      ],
-      content: [
-        html.button(
-          [
-            event.on_click(LanguageSelectionRequested(
-              !model.language_selection_open,
-            )),
-          ],
-          [icon.globe() |> icon.view() |> element.map(never)],
-        ),
-      ],
-    ),
+    block("elsewhere", [], [
+      html.p([], texts.elsewhere),
+      html.ul([], [
+        item([
+          icon.envelope() |> icon.view() |> element.map(never),
+          html.text(" ale"),
+          icon.at_sign() |> icon.view() |> element.map(never),
+          html.text("agj.cl"),
+        ]),
+        item([
+          icon.mastodon() |> icon.view() |> element.map(never),
+          html.text(" "),
+          link_ext(texts.mastodon, to: "https://mstdn.social/@agj"),
+        ]),
+        item([
+          icon.github() |> icon.view() |> element.map(never),
+          html.text(" "),
+          link_ext(texts.github, to: "https://github.com/agj"),
+        ]),
+      ]),
+    ]),
+
+    block("language-change", [], [
+      html.button(
+        [
+          event.on_click(LanguageSelectionRequested(
+            !model.language_selection_open,
+          )),
+        ],
+        [icon.globe() |> icon.view() |> element.map(never)],
+      ),
+    ]),
 
     // Language selection menu.
     block(
-      anchor: BottomLeft,
-      x: 2,
-      y: 5,
-      width: 9,
-      height: 11,
-      attrs: [
-        attribute.class(language_selection_menu_class),
-        case model.language_selection_open {
-          True -> attribute.none()
-          False -> attribute.class("hidden")
-        },
-      ],
-      content: [
+      "language-selection",
+      case model.language_selection_open {
+        True -> []
+        False -> [attribute.class("hidden")]
+      },
+      [
         view_language_button(
           "English",
           current: model.language,
@@ -253,46 +209,20 @@ const background_color = "#f5d9e5"
 
 const tertiary_color = "white"
 
-const language_change_button_class = "language-change"
+const language_change_block_name = "language-change"
 
-const language_selection_menu_class = "language-selection-menu"
+const language_selection_block_name = "language-selection"
 
 // HTML UTILITIES
 
-type Anchor {
-  TopLeft
-  TopRight
-  BottomLeft
-  BottomRight
-}
-
 fn block(
-  attrs attrs: List(Attribute(Msg)),
-  content content: List(Element(Msg)),
-  anchor anchor: Anchor,
-  x x: Int,
-  y y: Int,
-  width width: Int,
-  height height: Int,
+  name: String,
+  attrs: List(Attribute(Msg)),
+  content: List(Element(Msg)),
 ) -> Element(Msg) {
-  html.section(
-    [
-      attribute.class("block"),
-      attribute.styles([
-        #("min-height", rem(height)),
-        #("width", rem(width)),
-        ..{
-          case anchor {
-            TopLeft -> [#("top", rem(y)), #("left", rem(x))]
-            TopRight -> [#("top", rem(y)), #("right", rem(x))]
-            BottomLeft -> [#("bottom", rem(y)), #("left", rem(x))]
-            BottomRight -> [#("bottom", rem(y)), #("right", rem(x))]
-          }
-        }
-      ]),
-    ],
-    [html.div(attrs, content)],
-  )
+  html.section([attribute.class("block " <> block_name_to_class(name))], [
+    html.div(attrs, content),
+  ])
 }
 
 fn item(content: List(Element(Msg))) -> Element(Msg) {
@@ -363,6 +293,10 @@ fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
       Error(_) -> Nil
     }
   })
+}
+
+fn block_name_to_class(name: String) -> String {
+  "block-" <> name
 }
 
 fn class_to_selector(class: String) -> String {
