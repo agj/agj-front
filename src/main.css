@@ -13,12 +13,6 @@
   font-size: var(--u);
   height: 100%;
   padding: 0;
-
-  @media (width < 494px) {
-    /* 👆 container-size * u-regular */
-    /* Decrease unit size when viewport is too small, making everything smaller. */
-    --u: var(--u-small);
-  }
 }
 
 body {
@@ -62,12 +56,6 @@ p {
   width: calc(var(--container-size) * 1rem);
   /* Temporary, to more easily do the layout. */
   outline: 0.2rem solid white;
-
-  @media (width < 364px) {
-    /* 👆 container-size * u-small */
-    /* Make container width fit viewport width when there's not enough room. */
-    width: 100vw;
-  }
 }
 
 .block {
@@ -173,4 +161,24 @@ li {
 .icon > svg {
   position: relative;
   top: 0.1em;
+}
+
+/* RESPONSIVENESS */
+
+@media (width < 494px) {
+  /* 👆 container-size * u-regular */
+
+  :root {
+    /* Decrease unit size when viewport is too small, making everything smaller. */
+    --u: var(--u-small);
+  }
+}
+
+@media (width < 364px) {
+  /* 👆 container-size * u-small */
+
+  .container {
+    /* Make container width fit viewport width when there's not enough room. */
+    width: 100vw;
+  }
 }
