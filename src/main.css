@@ -168,7 +168,7 @@ li {
 
 @media ((width < 500px) or (height < 500px)) {
   :root {
-    --u: var(--u-small);
+    --u: min(var(--u-small), calc(100vw / var(--container-width-small)));
 
     background-position: top 0 left 50vw;
   }
