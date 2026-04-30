@@ -1,5 +1,7 @@
 :root {
   --container-size: 26;
+  --container-width-small: 20;
+  --container-height-small: 27;
   --u: var(--u-regular);
   --u-regular: 19px;
   --u-small: 16px;
@@ -176,11 +178,11 @@ li {
   }
 
   .container {
-    height: 27rem;
+    height: calc(1rem * var(--container-height-small));
     margin: 1rem 0;
-    max-width: 20rem;
+    max-width: calc(1rem * var(--container-width-small));
     position: relative;
-    width: 20rem;
+    width: calc(1rem * var(--container-width-small));
   }
 
   .block {
