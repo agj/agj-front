@@ -27,6 +27,10 @@ body {
 
 /* BASIC ELEMENTS */
 
+* {
+  transition-behavior: allow-discrete;
+}
+
 a {
   color: var(--foreground-color);
   text-decoration-color: var(--tertiary-color);
@@ -85,6 +89,8 @@ button {
 
   &:has(> .hidden) {
     display: none;
+    opacity: 0;
+    transform: translateY(0.5rem);
   }
 
   > div {
@@ -150,8 +156,15 @@ button {
   &.block-language-selection {
     bottom: 5rem;
     left: 2rem;
-    width: 9rem;
     min-height: 11rem;
+    transition-duration: 200ms;
+    transition-property: display, opacity, transform;
+    width: 9rem;
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
   }
 }
 
