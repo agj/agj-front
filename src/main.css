@@ -62,7 +62,7 @@ button {
   text-align: left;
 
   &:active {
-    transform: translateY(0.1rem);
+    translate: 0 0.1rem;
   }
 }
 
@@ -166,7 +166,7 @@ button {
   from {
     display: none;
     opacity: 0;
-    transform: translateY(0.5rem);
+    translate: 0 0.5rem;
   }
 }
 
@@ -174,7 +174,7 @@ button {
   to {
     display: none;
     opacity: 0;
-    transform: translateY(0.5rem);
+    translate: 0 0.5rem;
   }
 }
 
@@ -209,7 +209,7 @@ button {
     margin: 1rem 0;
     max-width: calc(1rem * var(--container-width-small));
     position: relative;
-    transform: translateY(
+    translate: 0
       round(
         to-zero,
         max(
@@ -217,8 +217,7 @@ button {
           calc((100vh - ((var(--container-height-small) + 2) * 1rem)) / 2)
         ),
         1rem
-      )
-    );
+      );
     width: calc(1rem * var(--container-width-small));
   }
 
