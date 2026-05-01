@@ -85,7 +85,13 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       config.save(config.Config(language:)),
     )
     ClickedOutsideLanguageSelection -> #(
-      Model(..model, language_selection_state: ClosedState),
+      Model(
+        ..model,
+        language_selection_state: case model.language_selection_state {
+          InitialState -> InitialState
+          _ -> ClosedState
+        },
+      ),
       effect.none(),
     )
   }
