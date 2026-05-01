@@ -40,12 +40,18 @@ type Msg {
 }
 
 type Model {
-  Model(language: Language, language_selection_open: Bool)
+  Model(language: Language, language_selection_state: OpenState)
+}
+
+type OpenState {
+  InitialState
+  OpenState
+  ClosedState
 }
 
 fn init(flags: Flags) -> #(Model, Effect(Msg)) {
   #(
-    Model(language: flags.language, language_selection_open: False),
+    Model(language: flags.language, language_selection_state: InitialState),
     effect.batch([
       config.read(GotSavedConfig),
       on_click_outside(
@@ -68,15 +74,18 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     GotSavedConfig(Error(Nil)) -> #(model, effect.none())
 
     LanguageSelectionRequested(open) -> #(
-      Model(..model, language_selection_open: open),
+      Model(..model, language_selection_state: case open {
+        True -> OpenState
+        False -> ClosedState
+      }),
       effect.none(),
     )
     LanguageSelected(language) -> #(
-      Model(language:, language_selection_open: False),
+      Model(language:, language_selection_state: ClosedState),
       config.save(config.Config(language:)),
     )
     ClickedOutsideLanguageSelection -> #(
-      Model(..model, language_selection_open: False),
+      Model(..model, language_selection_state: ClosedState),
       effect.none(),
     )
   }
@@ -141,9 +150,12 @@ fn view(model: Model) -> Element(Msg) {
     block("language-change", [], [
       html.button(
         [
-          event.on_click(LanguageSelectionRequested(
-            !model.language_selection_open,
-          )),
+          event.on_click(
+            LanguageSelectionRequested(case model.language_selection_state {
+              OpenState -> False
+              _ -> True
+            }),
+          ),
         ],
         [icon.globe() |> icon.view() |> element.map(never)],
       ),
@@ -152,10 +164,9 @@ fn view(model: Model) -> Element(Msg) {
     // Language selection menu.
     block(
       "language-selection",
-      case model.language_selection_open {
-        True -> []
-        False -> [attribute.class("hidden")]
-      },
+      [
+        attribute.class(open_state_to_class(model.language_selection_state)),
+      ],
       [
         view_language_button(
           "English",
@@ -257,6 +268,14 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
     { selector <> " { " <> styles_string <> " }" }
   })
   |> string.join("\n")
+}
+
+fn open_state_to_class(state: OpenState) -> String {
+  case state {
+    InitialState -> ""
+    ClosedState -> "exit"
+    OpenState -> "enter"
+  }
 }
 
 fn rem(n: Int) -> String {

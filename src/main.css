@@ -150,14 +150,21 @@ button {
   &.block-language-selection {
     animation-duration: 200ms;
     animation-fill-mode: forwards;
-    animation-name: enter;
     bottom: 5rem;
     left: 2rem;
     min-height: 11rem;
     width: 9rem;
 
-    &:has(> .hidden) {
+    &:has(> .enter) {
+      animation-name: enter;
+    }
+
+    &:has(> .exit) {
       animation-name: exit;
+    }
+
+    &:not(:has(> .enter)):not(:has(> .exit)) {
+      display: none;
     }
   }
 }
