@@ -25,6 +25,8 @@ body {
   margin: 0;
 }
 
+/* BASIC ELEMENTS */
+
 a {
   color: var(--foreground-color);
   text-decoration-color: var(--tertiary-color);
@@ -32,6 +34,18 @@ a {
   text-decoration-skip-ink: none;
   text-decoration-thickness: 0.2em;
   text-underline-offset: 0em;
+}
+
+p {
+  text-wrap-style: stable;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style: none;
 }
 
 button {
@@ -48,17 +62,17 @@ button {
   }
 }
 
-p {
-  text-wrap-style: stable;
-}
+/* CONTAINER */
 
 .container {
   height: calc(var(--container-size) * 1rem);
   position: relative;
   width: calc(var(--container-size) * 1rem);
   /* Temporary, to more easily do the layout. */
-  outline: 0.2rem solid white;
+  /* outline: 0.2rem solid white; */
 }
+
+/* BLOCKS */
 
 .block {
   align-items: center;
@@ -141,17 +155,7 @@ p {
   }
 }
 
-/* LISTS */
-
-ul {
-  padding: 0;
-}
-
-li {
-  list-style: none;
-}
-
-/* MORE */
+/* ICONS */
 
 .icon {
   display: inline-block;
