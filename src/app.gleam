@@ -161,7 +161,8 @@ fn view(model: Model) -> Element(Msg) {
               OpenState -> False
               _ -> True
             }),
-          ),
+          )
+          |> event.prevent_default,
         ],
         [icon.globe() |> icon.view() |> element.map(never)],
       ),
