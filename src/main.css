@@ -148,12 +148,12 @@ button {
   }
 
   &.block-language-selection {
+    animation-duration: 200ms;
+    animation-fill-mode: forwards;
+    animation-name: enter;
     bottom: 5rem;
     left: 2rem;
     min-height: 11rem;
-    animation-name: enter;
-    animation-duration: 200ms;
-    animation-fill-mode: both;
     width: 9rem;
 
     &:has(> .hidden) {
