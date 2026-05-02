@@ -11,7 +11,8 @@
   background-position: top 50vh left 50vw;
   background-size: var(--u);
   color: var(--foreground-color);
-  font-family: sans-serif;
+  font-family:
+    "Helvetica Neue", "Helvetica", "Roboto", "Noto Sans", "Arial", sans-serif;
   font-size: var(--u);
   height: 100%;
   padding: 0;
