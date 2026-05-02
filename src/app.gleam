@@ -1,7 +1,7 @@
 import config.{type Config}
 import css_svg
 import funtil.{never}
-import gleam/dynamic/decode
+import gleam/dynamic/decode.{type Decoder}
 import gleam/float
 import gleam/int
 import gleam/list
@@ -38,7 +38,7 @@ type Msg {
   LanguageSelectionRequested(Bool)
   LanguageSelected(Language)
   ClickedOutsideLanguageSelection
-  AnimationFinished(String)
+  LanguageSelectionAnimationFinished(String)
 }
 
 type Model {
@@ -99,12 +99,12 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
 
-    AnimationFinished("exit") -> #(
+    LanguageSelectionAnimationFinished("exit") -> #(
       Model(..model, language_selection_state: ClosedState),
       effect.none(),
     )
 
-    AnimationFinished(_) -> #(model, effect.none())
+    LanguageSelectionAnimationFinished(_) -> #(model, effect.none())
   }
 }
 
@@ -186,7 +186,14 @@ fn view(model: Model) -> Element(Msg) {
       OpenState | ClosingState ->
         block(
           "language-selection",
-          [attribute.class(open_state_to_class(model.language_selection_state))],
+          [
+            attribute.class(open_state_to_class(model.language_selection_state)),
+            event.on(
+              "animationend",
+              animation_name_decoder()
+                |> decode.map(LanguageSelectionAnimationFinished),
+            ),
+          ],
           [
             view_language_button(
               "English",
@@ -261,18 +268,9 @@ fn block(
   content: List(Element(Msg)),
 ) -> Element(Msg) {
   html.section(
+    [attribute.class("block " <> block_name_to_class(name)), ..attrs],
     [
-      attribute.class("block " <> block_name_to_class(name)),
-      event.on(
-        "animationend",
-        decode.at(
-          ["animationName"],
-          decode.string |> decode.map(AnimationFinished),
-        ),
-      ),
-    ],
-    [
-      html.div(attrs, content),
+      html.div([], content),
     ],
   )
 }
@@ -368,4 +366,8 @@ fn get_environment_language() -> Language {
   |> list.filter_map(language.parse_code)
   |> list.first
   |> result.unwrap(English)
+}
+
+fn animation_name_decoder() -> Decoder(String) {
+  decode.at(["animationName"], decode.string)
 }
