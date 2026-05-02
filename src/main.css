@@ -170,16 +170,11 @@ button {
       animation-name: exit;
       mask-image: linear-gradient(135deg, transparent 50%, white 50%);
     }
-
-    &:not(:has(> .enter)):not(:has(> .exit)) {
-      display: none;
-    }
   }
 }
 
 @keyframes enter {
   from {
-    display: none;
     mask-position: right;
   }
 }
@@ -187,10 +182,6 @@ button {
 @keyframes exit {
   from {
     mask-position: right;
-  }
-
-  to {
-    display: none;
   }
 }
 

@@ -1,6 +1,7 @@
 import config.{type Config}
 import css_svg
 import funtil.{never}
+import gleam/dynamic/decode
 import gleam/float
 import gleam/int
 import gleam/list
@@ -37,6 +38,7 @@ type Msg {
   LanguageSelectionRequested(Bool)
   LanguageSelected(Language)
   ClickedOutsideLanguageSelection
+  AnimationFinished(String)
 }
 
 type Model {
@@ -44,14 +46,14 @@ type Model {
 }
 
 type OpenState {
-  InitialState
   OpenState
+  ClosingState
   ClosedState
 }
 
 fn init(flags: Flags) -> #(Model, Effect(Msg)) {
   #(
-    Model(language: flags.language, language_selection_state: InitialState),
+    Model(language: flags.language, language_selection_state: ClosedState),
     effect.batch([
       config.read(GotSavedConfig),
       on_click_outside(
@@ -76,24 +78,33 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     LanguageSelectionRequested(open) -> #(
       Model(..model, language_selection_state: case open {
         True -> OpenState
-        False -> ClosedState
+        False -> ClosingState
       }),
       effect.none(),
     )
+
     LanguageSelected(language) -> #(
-      Model(language:, language_selection_state: ClosedState),
+      Model(language:, language_selection_state: ClosingState),
       config.save(config.Config(language:)),
     )
+
     ClickedOutsideLanguageSelection -> #(
       Model(
         ..model,
         language_selection_state: case model.language_selection_state {
-          InitialState -> InitialState
-          _ -> ClosedState
+          OpenState | ClosingState -> ClosingState
+          ClosedState -> ClosedState
         },
       ),
       effect.none(),
     )
+
+    AnimationFinished("exit") -> #(
+      Model(..model, language_selection_state: ClosedState),
+      effect.none(),
+    )
+
+    AnimationFinished(_) -> #(model, effect.none())
   }
 }
 
@@ -159,7 +170,7 @@ fn view(model: Model) -> Element(Msg) {
           event.on_click(
             LanguageSelectionRequested(case model.language_selection_state {
               OpenState -> False
-              _ -> True
+              ClosingState | ClosedState -> True
             }),
           )
           |> event.prevent_default,
@@ -169,26 +180,37 @@ fn view(model: Model) -> Element(Msg) {
     ]),
 
     // Language selection menu.
-    block(
-      "language-selection",
-      [
-        attribute.class(open_state_to_class(model.language_selection_state)),
-      ],
-      [
-        view_language_button(
-          "English",
-          current: model.language,
-          target: English,
-        ),
-        view_language_button(
-          "Español",
-          current: model.language,
-          target: Spanish,
-        ),
-        view_language_button("日本語", current: model.language, target: Japanese),
-        view_language_button("中文", current: model.language, target: Mandarin),
-      ],
-    ),
+    case model.language_selection_state {
+      ClosedState -> element.none()
+
+      OpenState | ClosingState ->
+        block(
+          "language-selection",
+          [attribute.class(open_state_to_class(model.language_selection_state))],
+          [
+            view_language_button(
+              "English",
+              current: model.language,
+              target: English,
+            ),
+            view_language_button(
+              "Español",
+              current: model.language,
+              target: Spanish,
+            ),
+            view_language_button(
+              "日本語",
+              current: model.language,
+              target: Japanese,
+            ),
+            view_language_button(
+              "中文",
+              current: model.language,
+              target: Mandarin,
+            ),
+          ],
+        )
+    },
   ])
 }
 
@@ -238,9 +260,21 @@ fn block(
   attrs: List(Attribute(Msg)),
   content: List(Element(Msg)),
 ) -> Element(Msg) {
-  html.section([attribute.class("block " <> block_name_to_class(name))], [
-    html.div(attrs, content),
-  ])
+  html.section(
+    [
+      attribute.class("block " <> block_name_to_class(name)),
+      event.on(
+        "animationend",
+        decode.at(
+          ["animationName"],
+          decode.string |> decode.map(AnimationFinished),
+        ),
+      ),
+    ],
+    [
+      html.div(attrs, content),
+    ],
+  )
 }
 
 fn item(content: List(Element(Msg))) -> Element(Msg) {
@@ -279,9 +313,9 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
 
 fn open_state_to_class(state: OpenState) -> String {
   case state {
-    InitialState -> ""
-    ClosedState -> "exit"
     OpenState -> "enter"
+    ClosingState -> "exit"
+    ClosedState -> ""
   }
 }
 
