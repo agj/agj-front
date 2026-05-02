@@ -311,7 +311,7 @@ fn css_to_string(css: List(#(String, List(#(String, String))))) -> String {
 
 fn open_state_to_class(state: OpenState) -> String {
   case state {
-    OpenState -> "enter"
+    OpenState -> ""
     ClosingState -> "exit"
     ClosedState -> ""
   }

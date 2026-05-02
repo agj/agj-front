@@ -157,14 +157,11 @@ button {
 
     animation-duration: 200ms;
     animation-fill-mode: forwards;
+    animation-name: enter;
+    mask-image: linear-gradient(135deg, white 50%, transparent 50%);
     mask-position: left;
     mask-repeat: no-repeat;
     mask-size: 333% 100%;
-
-    &.enter {
-      animation-name: enter;
-      mask-image: linear-gradient(135deg, white 50%, transparent 50%);
-    }
 
     &.exit {
       animation-name: exit;
@@ -180,6 +177,7 @@ button {
 }
 
 @keyframes exit {
+  /* This animation is repeated because we need it to play again. */
   from {
     mask-position: right;
   }
