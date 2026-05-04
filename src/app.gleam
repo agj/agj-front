@@ -103,6 +103,11 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
 
+    LanguageSelectionAnimationFinished("enter") -> #(
+      model,
+      focus_language_button(model.language),
+    )
+
     LanguageSelectionAnimationFinished("exit") -> #(
       Model(..model, language_selection_state: ClosedState),
       effect.none(),
@@ -134,10 +139,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       effect.none(),
     )
 
-    KeyPressed(key) -> {
-      echo key
-      #(model, effect.none())
-    }
+    KeyPressed(_) -> #(model, effect.none())
 
     NoOp -> #(model, effect.none())
   }
