@@ -13,6 +13,8 @@ pub type Texts(msg) {
     games: String,
     mastodon: String,
     github: String,
+    language_button: String,
+    language_menu: String,
   )
 }
 
@@ -42,6 +44,8 @@ fn english() -> Texts(msg) {
     games: "games",
     mastodon: "Mastodon",
     github: "Github",
+    language_button: "Change language",
+    language_menu: "Language selection",
   )
 }
 
@@ -62,6 +66,8 @@ fn spanish() -> Texts(msg) {
     games: "juegos",
     mastodon: "Mastodon",
     github: "Github",
+    language_button: "Cambiar idioma",
+    language_menu: "Selección de idioma",
   )
 }
 
@@ -82,6 +88,8 @@ fn japanese() -> Texts(msg) {
     games: "ゲーム",
     mastodon: "マストドン",
     github: "Github",
+    language_button: "言語を変更",
+    language_menu: "言語リスト",
   )
 }
 
@@ -102,5 +110,7 @@ fn mandarin() -> Texts(msg) {
     games: "遊戲",
     mastodon: "Mastodon",
     github: "Github",
+    language_button: "換語言",
+    language_menu: "語言清單",
   )
 }

@@ -164,16 +164,21 @@ fn view(model: Model) -> Element(Msg) {
       ]),
     ]),
 
+    // Language selection button.
     block("language-change", [], [
       html.button(
         [
+          attribute.aria_label(texts.language_button),
+          attribute.aria_haspopup("listbox"),
+          attribute.aria_expanded(model.language_selection_state == OpenState),
+          attribute.aria_activedescendant(language.to_id(model.language)),
           event.on_click(
             LanguageSelectionRequested(case model.language_selection_state {
               OpenState -> False
               ClosingState | ClosedState -> True
             }),
           )
-          |> event.prevent_default,
+            |> event.prevent_default,
         ],
         [icon.globe() |> icon.view() |> element.map(never)],
       ),
@@ -188,6 +193,8 @@ fn view(model: Model) -> Element(Msg) {
           "language-selection",
           [
             attribute.class(open_state_to_class(model.language_selection_state)),
+            attribute.aria_label(texts.language_menu),
+            attribute.role("listbox"),
             event.on(
               "animationend",
               animation_name_decoder()
@@ -226,14 +233,23 @@ fn view_language_button(
   current current: Language,
   target target: Language,
 ) -> Element(Msg) {
-  let check_icon = case target == current {
+  let selected = target == current
+  let check_icon = case selected {
     True -> icon.check()
     False -> icon.empty()
   }
-  html.button([event.on_click(LanguageSelected(target))], [
-    check_icon |> icon.view() |> element.map(never),
-    html.text(" " <> label),
-  ])
+  html.button(
+    [
+      attribute.id(language.to_id(target)),
+      attribute.role("option"),
+      attribute.aria_selected(selected),
+      event.on_click(LanguageSelected(target)),
+    ],
+    [
+      check_icon |> icon.view() |> element.map(never),
+      html.text(" " <> label),
+    ],
+  )
 }
 
 fn global_css() -> String {

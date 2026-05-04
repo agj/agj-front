@@ -27,6 +27,10 @@ pub fn to_string(language: Language) -> String {
   }
 }
 
+pub fn to_id(language: Language) -> String {
+  "language-" <> to_string(language)
+}
+
 pub fn decoder() -> Decoder(Language) {
   use result <- decode.then(decode.string |> decode.map(parse_code))
 
