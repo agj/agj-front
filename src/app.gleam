@@ -4,7 +4,6 @@ import funtil.{never}
 import gleam/dynamic/decode.{type Decoder}
 import gleam/float
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
@@ -41,6 +40,9 @@ type Msg {
   ClickedOutsideLanguageSelection
   LanguageSelectionAnimationFinished(String)
   KeyPressed(String)
+  RequestedSelectPreviousLanguageButton(current_selection: Language)
+  RequestedSelectNextLanguageButton(current_selection: Language)
+  NoOp
 }
 
 type Model {
@@ -108,6 +110,20 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 
     LanguageSelectionAnimationFinished(_) -> #(model, effect.none())
 
+    RequestedSelectPreviousLanguageButton(current_selection:) -> #(
+      model,
+      list_previous(language.all, current_selection)
+        |> result.map(focus_language_button)
+        |> result.unwrap(effect.none()),
+    )
+
+    RequestedSelectNextLanguageButton(current_selection:) -> #(
+      model,
+      list_next(language.all, current_selection)
+        |> result.map(focus_language_button)
+        |> result.unwrap(effect.none()),
+    )
+
     KeyPressed("Escape") -> #(
       Model(
         ..model,
@@ -122,6 +138,8 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       echo key
       #(model, effect.none())
     }
+
+    NoOp -> #(model, effect.none())
   }
 }
 
@@ -225,35 +243,18 @@ fn view(model: Model) -> Element(Msg) {
                 |> decode.map(LanguageSelectionAnimationFinished),
             ),
           ],
-          [
-            view_language_button(
-              "English",
-              current: model.language,
-              target: English,
-            ),
-            view_language_button(
-              "Español",
-              current: model.language,
-              target: Spanish,
-            ),
-            view_language_button(
-              "日本語",
-              current: model.language,
-              target: Japanese,
-            ),
-            view_language_button(
-              "中文",
-              current: model.language,
-              target: Mandarin,
-            ),
-          ],
+          {
+            language.all
+            |> list.map(fn(language) {
+              view_language_button(current: model.language, target: language)
+            })
+          },
         )
     },
   ])
 }
 
 fn view_language_button(
-  label: String,
   current current: Language,
   target target: Language,
 ) -> Element(Msg) {
@@ -268,10 +269,36 @@ fn view_language_button(
       attribute.role("option"),
       attribute.aria_selected(selected),
       event.on_click(LanguageSelected(target)),
+      event.advanced(
+        "keydown",
+        decode.at(["key"], decode.string)
+          |> decode.map(fn(key) {
+            case key {
+              "ArrowUp" ->
+                event.handler(
+                  RequestedSelectPreviousLanguageButton(target),
+                  prevent_default: True,
+                  stop_propagation: True,
+                )
+              "ArrowDown" ->
+                event.handler(
+                  RequestedSelectNextLanguageButton(target),
+                  prevent_default: True,
+                  stop_propagation: True,
+                )
+              _ ->
+                event.handler(
+                  NoOp,
+                  prevent_default: False,
+                  stop_propagation: False,
+                )
+            }
+          }),
+      ),
     ],
     [
       check_icon |> icon.view() |> element.map(never),
-      html.text(" " <> label),
+      html.text(" " <> language.name(target)),
     ],
   )
 }
@@ -401,6 +428,18 @@ fn on_keydown(msg: fn(String) -> msg) -> Effect(msg) {
   })
 }
 
+fn focus_element_with_id(id: String) -> Effect(msg) {
+  use _ <- effect.from
+
+  document.get_element_by_id(id)
+  |> result.map(fn(element) { pelement.focus(element) })
+  |> result.unwrap(Nil)
+}
+
+fn focus_language_button(language: Language) -> Effect(msg) {
+  focus_element_with_id(language.to_id(language))
+}
+
 // OTHER
 
 fn block_name_to_class(name: String) -> String {
@@ -420,4 +459,44 @@ fn get_environment_language() -> Language {
 
 fn animation_name_decoder() -> Decoder(String) {
   decode.at(["animationName"], decode.string)
+}
+
+fn list_next(list: List(a), item: a) -> Result(a, Nil) {
+  case list.first(list) {
+    Ok(first) -> list_next_iter(list, item, first)
+    Error(Nil) -> Error(Nil)
+  }
+}
+
+fn list_next_iter(remaining: List(a), item: a, first: a) -> Result(a, Nil) {
+  case remaining {
+    // Found next.
+    [cur, found, ..] if item == cur -> Ok(found)
+    // Found at last position; wrapping, we get the first item.
+    [cur] if item == cur && item != first -> Ok(first)
+    // Not found this time; iterate.
+    [_, ..rest] -> list_next_iter(rest, item, first)
+    // Not here.
+    [] -> Error(Nil)
+  }
+}
+
+fn list_previous(list: List(a), item: a) -> Result(a, Nil) {
+  case list.last(list) {
+    Ok(last) -> list_previous_iter(list, item, last)
+    Error(Nil) -> Error(Nil)
+  }
+}
+
+fn list_previous_iter(remaining: List(a), item: a, last: a) -> Result(a, Nil) {
+  case remaining {
+    // Found in first position, so we wrap and return the last item.
+    [cur, ..] if cur == item && item != last -> Ok(last)
+    // Found previous.
+    [found, cur, ..] if item == cur -> Ok(found)
+    // Not found this time; iterate.
+    [_, ..rest] -> list_previous_iter(rest, item, last)
+    // Not here.
+    [] -> Error(Nil)
+  }
 }

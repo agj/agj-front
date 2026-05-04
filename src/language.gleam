@@ -8,6 +8,13 @@ pub type Language {
   Mandarin
 }
 
+pub const all = [
+  English,
+  Spanish,
+  Japanese,
+  Mandarin,
+]
+
 pub fn parse_code(code: String) -> Result(Language, Nil) {
   case string.lowercase(code) {
     "en" <> _ -> Ok(English)
@@ -29,6 +36,15 @@ pub fn to_string(language: Language) -> String {
 
 pub fn to_id(language: Language) -> String {
   "language-" <> to_string(language)
+}
+
+pub fn name(language: Language) -> String {
+  case language {
+    English -> "English"
+    Spanish -> "Español"
+    Japanese -> "日本語"
+    Mandarin -> "中文"
+  }
 }
 
 pub fn decoder() -> Decoder(Language) {
