@@ -118,7 +118,7 @@ fn view(model: Model) -> Element(Msg) {
 
     block("introduction", [], [
       html.p([], texts.introduction),
-      html.ul([], [
+      html.menu([], [
         item([
           html.b([], [link(texts.blog, to: "https://blog.agj.cl/")]),
         ]),
@@ -132,7 +132,7 @@ fn view(model: Model) -> Element(Msg) {
 
     block("unmaintained", [], [
       html.p([], texts.less_maintained),
-      html.ul([], [
+      html.menu([], [
         item([
           link(texts.pictures, to: "https://piclog.agj.cl/"),
         ]),
@@ -144,7 +144,7 @@ fn view(model: Model) -> Element(Msg) {
 
     block("elsewhere", [], [
       html.p([], texts.elsewhere),
-      html.ul([], [
+      html.menu([], [
         item([
           icon.envelope() |> icon.view() |> element.map(never),
           html.text(" ale"),

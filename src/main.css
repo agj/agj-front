@@ -45,7 +45,8 @@ p {
   text-wrap-style: stable;
 }
 
-ul {
+ul,
+menu {
   padding: 0;
 }
 
