@@ -4,6 +4,7 @@ import funtil.{never}
 import gleam/dynamic/decode.{type Decoder}
 import gleam/float
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
@@ -39,6 +40,7 @@ type Msg {
   LanguageSelected(Language)
   ClickedOutsideLanguageSelection
   LanguageSelectionAnimationFinished(String)
+  KeyPressed(String)
 }
 
 type Model {
@@ -62,6 +64,7 @@ fn init(flags: Flags) -> #(Model, Effect(Msg)) {
           |> list.map(class_to_selector),
         ClickedOutsideLanguageSelection,
       ),
+      on_keydown(KeyPressed),
     ]),
   )
 }
@@ -78,7 +81,7 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     LanguageSelectionRequested(open) -> #(
       Model(..model, language_selection_state: case open {
         True -> OpenState
-        False -> ClosingState
+        False -> close_open_state(model.language_selection_state)
       }),
       effect.none(),
     )
@@ -91,10 +94,9 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     ClickedOutsideLanguageSelection -> #(
       Model(
         ..model,
-        language_selection_state: case model.language_selection_state {
-          OpenState | ClosingState -> ClosingState
-          ClosedState -> ClosedState
-        },
+        language_selection_state: close_open_state(
+          model.language_selection_state,
+        ),
       ),
       effect.none(),
     )
@@ -105,6 +107,28 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     )
 
     LanguageSelectionAnimationFinished(_) -> #(model, effect.none())
+
+    KeyPressed("Escape") -> #(
+      Model(
+        ..model,
+        language_selection_state: close_open_state(
+          model.language_selection_state,
+        ),
+      ),
+      effect.none(),
+    )
+
+    KeyPressed(key) -> {
+      echo key
+      #(model, effect.none())
+    }
+  }
+}
+
+fn close_open_state(state: OpenState) -> OpenState {
+  case state {
+    OpenState | ClosingState -> ClosingState
+    ClosedState -> ClosedState
   }
 }
 
@@ -341,11 +365,11 @@ fn rem_(n: Float) -> String {
   { float.to_string(n) } <> "rem"
 }
 
-// OTHER
+// EFFECTS
 
 /// Triggers a message when a click event is triggered in the document but
 /// outside of a list of elements whose DOM selectors you provide.
-fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
+fn on_click_outside(selectors: List(String), msg: msg) -> Effect(msg) {
   use dispatch <- effect.from
 
   document.add_event_listener("click", fn(event) {
@@ -368,6 +392,16 @@ fn on_click_outside(selectors: List(String), msg: Msg) -> Effect(Msg) {
     }
   })
 }
+
+fn on_keydown(msg: fn(String) -> msg) -> Effect(msg) {
+  use dispatch <- effect.from
+
+  document.add_event_listener("keydown", fn(event) {
+    dispatch(msg(pevent.key(event)))
+  })
+}
+
+// OTHER
 
 fn block_name_to_class(name: String) -> String {
   "block-" <> name
