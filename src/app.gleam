@@ -24,7 +24,7 @@ import texts
 pub fn main() -> Nil {
   let app = lustre.application(init, update, view)
   let assert Ok(_) =
-    lustre.start(app, "#app", Flags(language: get_environment_language()))
+    lustre.start(app, "body", Flags(language: get_environment_language()))
 
   Nil
 }
@@ -157,7 +157,7 @@ fn close_open_state(state: OpenState) -> OpenState {
 fn view(model: Model) -> Element(Msg) {
   let texts = texts.for_language(model.language)
 
-  html.div([attribute.class("container")], [
+  html.div([attribute.id("container")], [
     html.style([], global_css()),
 
     block("introduction", [], [
