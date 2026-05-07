@@ -69,9 +69,11 @@ button {
 /* CONTAINER */
 
 #container {
+  flex-shrink: 0;
+  position: absolute;
+
   height: calc(var(--container-size) * 1rem);
   left: calc(50vw - (var(--container-size) / 2 * 1rem));
-  position: absolute;
   top: calc(50vh - (var(--container-size) / 2 * 1rem));
   width: calc(var(--container-size) * 1rem);
 
@@ -195,7 +197,7 @@ button {
   :root {
     --u: min(var(--u-small), calc(100vw / var(--container-width-small)));
 
-    background-position: top 0 left 50vw;
+    background-position: top left;
   }
 
   body {
@@ -204,13 +206,18 @@ button {
   }
 
   #container {
-    align-self: center;
+    position: relative;
+
     height: calc(1rem * var(--container-height-small));
     left: unset;
     max-width: calc(1rem * var(--container-width-small));
-    position: relative;
     top: unset;
-    translate: 0
+    width: calc(1rem * var(--container-width-small));
+
+    translate: round(
+        max(0rem, calc((100vw - (var(--container-width-small) * 1rem)) / 2)),
+        1rem
+      )
       round(
         to-zero,
         max(
@@ -219,7 +226,6 @@ button {
         ),
         1rem
       );
-    width: calc(1rem * var(--container-width-small));
   }
 
   .block {
