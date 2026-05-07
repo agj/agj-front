@@ -7,40 +7,8 @@
     <meta name="description" content="Ale Grilli (agj)’s home on the web." />
     <link rel="icon" type="image/gif" href="/icon.gif" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <link rel="stylesheet" href="./source/css/minireset.min.css" />
-    <link rel="stylesheet" href="./source/css/style.css" />
   </head>
   <body>
-    <script type="module">
-      import { Elm } from "./source/elm/Main.elm";
-
-      const app = Elm.Main.init({
-        flags: {
-          languages: window.navigator.languages
-            ? window.navigator.languages
-            : window.navigator.language
-            ? [window.navigator.language]
-            : [],
-        },
-      });
-
-      const saveStateKey = "home-state";
-
-      app.ports.portToJs.subscribe(({ kind, value }) => {
-        switch (kind) {
-          case "saveState":
-            localStorage.setItem(saveStateKey, value);
-            break;
-
-          case "requestState":
-            app.ports.portFromJs.send({
-              kind: "saveStateLoaded",
-              value: localStorage.getItem(saveStateKey),
-            });
-            break;
-        }
-      });
-    </script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>
