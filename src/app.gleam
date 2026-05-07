@@ -2,14 +2,12 @@ import config.{type Config}
 import css_svg
 import funtil.{never}
 import gleam/dynamic/decode.{type Decoder}
-import gleam/float
-import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
 import icon
 import js
-import language.{type Language, English, Japanese, Mandarin, Spanish}
+import language.{type Language}
 import lustre
 import lustre/attribute.{type Attribute}
 import lustre/effect.{type Effect}
@@ -386,14 +384,6 @@ fn open_state_to_class(state: OpenState) -> String {
   }
 }
 
-fn rem(n: Int) -> String {
-  int.to_string(n) <> "rem"
-}
-
-fn rem_(n: Float) -> String {
-  { float.to_string(n) } <> "rem"
-}
-
 // EFFECTS
 
 /// Triggers a message when a click event is triggered in the document but
@@ -456,7 +446,7 @@ fn get_environment_language() -> Language {
   js.languages()
   |> list.filter_map(language.parse_code)
   |> list.first
-  |> result.unwrap(English)
+  |> result.unwrap(language.English)
 }
 
 fn animation_name_decoder() -> Decoder(String) {
