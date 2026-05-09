@@ -158,6 +158,7 @@ button {
     animation-duration: 200ms;
     animation-fill-mode: forwards;
     animation-name: enter;
+    animation-timing-function: linear;
     mask-image: linear-gradient(135deg, white 50%, transparent 50%);
     mask-position: left;
     mask-repeat: no-repeat;
